@@ -1,0 +1,83 @@
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/repos/apparatus/!svn/ver/579/apparatus/templates/apparatus
+END
+page.html
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/repos/apparatus/!svn/ver/501/apparatus/templates/apparatus/page.html
+END
+apparatus.html
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/repos/apparatus/!svn/ver/501/apparatus/templates/apparatus/apparatus.html
+END
+createsidebarform.html
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/repos/apparatus/!svn/ver/491/apparatus/templates/apparatus/createsidebarform.html
+END
+sidebareditform.html
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/repos/apparatus/!svn/ver/491/apparatus/templates/apparatus/sidebareditform.html
+END
+versionconfirm.html
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/repos/apparatus/!svn/ver/555/apparatus/templates/apparatus/versionconfirm.html
+END
+content_block.html
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/repos/apparatus/!svn/ver/596/apparatus/templates/apparatus/content_block.html
+END
+addsidebarform.html
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/repos/apparatus/!svn/ver/491/apparatus/templates/apparatus/addsidebarform.html
+END
+deleteform.html
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/repos/apparatus/!svn/ver/517/apparatus/templates/apparatus/deleteform.html
+END
+createform.html
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/repos/apparatus/!svn/ver/1/apparatus/templates/apparatus/createform.html
+END
+index.html
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/repos/apparatus/!svn/ver/501/apparatus/templates/apparatus/index.html
+END
+editform.html
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/repos/apparatus/!svn/ver/549/apparatus/templates/apparatus/editform.html
+END
+grouppage.html
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/repos/apparatus/!svn/ver/579/apparatus/templates/apparatus/grouppage.html
+END
+moveform.html
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/repos/apparatus/!svn/ver/520/apparatus/templates/apparatus/moveform.html
+END

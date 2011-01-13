@@ -1,0 +1,45 @@
+{% extends 'base_message.html' %}
+
+{% block title %} {{ group }} wiki: edit page {% endblock %}
+
+{% block content %}
+  <div id="message">
+    {% if create %}
+    <h1>Create wiki page</h1>
+    <p class="message-error">No page exists here. If you continue, you will 
+    create one</p>
+    {% else %}
+    <h1>Edit wiki page</h1>
+    {% endif %}
+    <form action="" method="post" enctype="multipart/form-data">
+      {{wform.as_p}}
+      {{cform.as_p}}
+      <p class="form-note">To create a wiki link to a new / existing page in 
+      this wiki, surround the link text with double square brackets. This word 
+      will become the indetifier for the new page. E.g. a link in the 
+      researchpages wiki (http://researchpages.net/rp/wiki/) such as [[testlink]] would link to http://researchpages.net/rp/wiki/testlink/ automatically. 
+      <br>
+      Other than these wiki links, formatting is just the same as for other 
+      pages, using the <a href="http://hobix.com/textile/">textile</a> markup language. Normal links to non-wiki pages are allowed of course, and can be written as textile links e.g. "link text":http://url/to/site or as normal html links. 
+      </p>
+      <p class="submit"><input type="submit" value="Save" /></p>
+    </form>
+    <div class="versions">
+      <a name="versions"></a>
+      <h2>Versions</h2>
+      {% if wikipage.wpcontent.all %}
+        <p>Choose and older version to revert to:</p>
+        {% for version in wikipage.wpcontent.all %}
+          {% if not forloop.first %}
+          <p class="version">
+          <a href="versions/{{versions.version}}">{{version.version}}.  {{version.title}}</a>
+          <span class="version-stamp">
+            {{ version.last_editor }}, {{ version.last_updated|date:"G:i, d/m/Y"}}
+          </span>
+          </p>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base_mail.html" %}
+
+{% block title %}Welcome to ResearchPages{% endblock %}
+
+{% block body %}
+<h1>Welcome to ResearchPages</h1>
+
+<p>Your information has been added to the <a href="{{ urlbase }}/">ResearchPages web site</a>. This has happened because either a) You have requested a ResearchPages page or b) a group or project you are involved with is setting up a site on ResearchPages.</p>
+  <p>You can log in with the following details:</p>
+
+  <ul>
+    <li>Username: {{ person.user.username }}</li>
+    <li>Password: {{ person.password }}</li>
+  </ul>
+
+  <p>To log in now, go to <a href="{{ urlbase }}/accounts/login/">the log in 
+  page</a>.</p>
+
+    <p>A personal 'home' page has been created for you at:</p>
+
+    <ul>
+      <li><a href="{{ person.get_absolute_url }}">{{ person.get_absolute_url }}</a></li>
+    </ul>
+    <p>If you are a member of a research group or project whose pages are on the 
+    site, you will also be able to access and edit your personal through the 
+    group's pages e.g. <a href="http://researchpages.net/QQ/">Quaternary QUEST</a>
+
+    <p>ResearchPages can be used to keep track of people and publications, to share files and very soon, to share news and organise events. You can also create your own pages on the site. For more information, 
+    visit the <a href="{{ urlbase }}/help/welcome/">introduction page</a>.</p>
+
+  <p>Please let me know if you have any questions or suggestions.</p>
+
+  <p>Your sincerely</p>
+
+  <p>Martin Johnson</p>
+
+  <p>email:martin.johnson@uea.ac.uk</p>
+
+{% endblock %}

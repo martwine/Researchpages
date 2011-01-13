@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+{% load apparatus vars %}
+{% pushvars esmg.apparatus.views.basetemplatelinks %}
+
+<html lang="en">
+  <head>
+    <title>{% block title %}{% endblock %} | ResearchPages.net</title>
+    <link rel="stylesheet" type="text/css" href="{{urlbase}}/media/styles.css">
+    {% if css %}
+      <link rel="stylesheet" type="text/css" href="{{css}}">
+    {% endif %}
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="description" content="{% block description %}{% endblock %}">
+    <meta name="keywords" content="{% block keywords %}{% endblock %}">
+    {% block header_extra %}{% endblock %}
+    
+  </head>
+  
+  <body>
+    <div id="page">
+      {% include 'globals-snippet.html' %}
+
+      {% block body %}
+      {% block content %}
+      {% endblock %}
+      {% endblock %}
+
+      <div id="bottom">
+        &copy; {% now "Y" %} all rights reserved.
+        {% block attrs %}{% endblock %}
+      </div>
+      &nbsp;
+    </div>
+  </body>
+</html>
+

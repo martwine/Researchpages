@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}{% if grouphome %}{{ group }}{% else %}{{group}}: {{pagecontent.title}}{% endif %}{% endblock %}
+
+{% block keywords %}{% firstof keywords group.keywords%}{% endblock %}
+{% block description %}{% firstof description group.description%}{% endblock %}
+
+{% block content %}
+   {% include "apparatus/content_block.html" %}
+{% endblock %}
+

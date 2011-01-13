@@ -1,0 +1,32 @@
+{% extends "base_message.html" %}
+
+{% block title %}Log in{% endblock %}
+
+{% block content %}
+  <div id="message">
+  <h1>Log in</h1>
+    {% if form.has_errors %}
+    <p class="message-error">Your username and password didn't match.  If 
+      you don't know your password, <a
+      href="{{ urlbase }}/accounts/forgotpassword/">we can send you a 
+      reminder</a>.</p>
+    {% endif %}
+    &nbsp;
+    <form method="post" action="">
+      <input type="hidden" name="next" value="{% if next %}{{ next }}{% else %}{{urlbase}}/home/{% endif %}"/>
+      <p><label for="id_username">Username</label>
+        <input type="text" id="id_username" class="vTextField required" name="username" size="30" value="" maxlength="30" />
+      </p>
+      <p>  
+        <label for="id_password">Password</label>
+        <input type="password" id="id_password" class="vPasswordField required" name="password" size="15" value="" maxlength="30" />
+      </p>
+      <p class="submit">
+        <input type="submit" value="Log in">
+      </p>
+    </form>
+    <p>Forgotten your password? <a
+    href="{{ urlbase }}/accounts/forgotpassword/">Click here to receive a 
+    reminder by email</a>.</p>
+  </div>
+{% endblock %}

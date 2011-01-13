@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Create new page below &ldquo;{{ page.pcontent.latest.title }}&rdquo;{% endblock %}
+
+{% block content %}
+  <h1>Create new page below &ldquo;{{ page.pcontent.latest.title }}&rdquo;</h1>
+
+  <div id="wide">
+    <form action="" method="post">
+      <div class="form-line">
+        <label for="{{ form.identifier.get_id }}">Page address</label> 
+        {{ form.identifier }}
+        <div class="form-note">
+          The part of the URL which refers directly to this page e.g. 
+          http://solas-int.org/<strong>publications</strong>
+        </div>
+      </div>
+      <div class="form-line">
+        <label for="{{ form.editor.get_id }}">Editor</label> 
+        {{ form.editor }}
+        <div class="form-note">The person who will be responsible for editing 
+        this page. Editors of parent pages will also be able to edit this 
+        page.</div>
+      </div>
+      <div class="form-submit">
+        <input type="submit" value="Save">
+      </div>
+    </form>
+  </div>
+{% endblock %}  

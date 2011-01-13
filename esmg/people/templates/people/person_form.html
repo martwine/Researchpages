@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Edit your details{% endblock %}
+
+{% block content %}
+
+  <div id="bigform">
+    
+  <h1>Edit your details </h1>
+  <div id="actions" class="formactions">
+    <h2>Actions</h2>
+    <ul>
+    <li><a href="../password">Change my password</a></li>
+  </ul>
+  </div>
+
+  {% if form.has_errors %}
+      <p class="message-error">Your submission contains errors displayed below.</p>
+    {% endif %}
+
+    <form action="" method="post" enctype="multipart/form-data">
+      <p>
+        <label for="{{ form.title.get_id }}">Title</label> 
+        {{ form.title }}
+        {% if form.title.errors %}<ul class="errorlist">{{ form.title.html_error_list }}</ul>{% endif %}
+        </p>
+      
+        <p>
+        <label for="{{ form.first_name.get_id }}">First name</label> 
+        {{ form.first_name }}
+        {% if form.first_name.errors %}<ul class="errorlist">{{ form.first_name.html_error_list }}</ul>{% endif %}
+        </p>
+      
+        <p>
+        <label for="{{ form.last_name.get_id }}">Last name</label> 
+        {{ form.last_name }}
+        {% if form.last_name.errors %}<ul class="errorlist">{{ form.last_name.html_error_list }}</ul>{% endif %}
+        </p>
+      
+        <p>
+        <label for="{{ form.email.get_id }}">Email address</label> 
+        {{ form.email }}
+        {% if form.email.errors %}<ul class="errorlist">{{ form.email.html_error_list }}</ul>{% endif %}
+        </p>
+      
+        <p>
+        <label for="{{ form.desc.get_id }}">Academic title</label> 
+        {{ form.desc }}
+        {% if form.desc.errors %}<ul class="errorlist">{{ form.desc.html_error_list }}</ul>{% endif %}
+        </p>
+        <p class="form-note">
+          e.g. <i>Professor of Earth System Science</i> or <i>Researcher in 
+            marine biogeochemistry</i>. This will appear under you name in your 
+          'profile' page</p>
+      
+          <p>
+          <label for="{{ form.institution.get_id }}">Institution</label> 
+        {{ form.institution }}
+        {% if form.institution.errors %}<ul class="errorlist">{{ form.institution.html_error_list }}</ul>{% endif %}
+        </p>
+        <p class="form-note">If your institution is not listed you can add it <a href="{{urlbase}}/institutions/add/" target="_blank" onclick="window.open('{{urlbase}}/institutions/add/','add institution details','width=500,height=450,toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes'); return false;">here</a>. You will need to refresh this form for it to appear in your list of options. If you're running an up-to date internet browser you shouldn't lose your other changes when you refresh.</p>
+        
+        <label for="{{ form.department.get_id }}">Department </label> 
+        {{ form.department }}
+        {% if form.department.errors %}<ul class="errorlist">{{ form.department.html_error_list }}</ul>{% endif %}
+        </p>
+        <p class="form-note">e.g. School of Environmental Sciences</p>
+      
+        <label for="{{ form.subdepartmentchar.get_id }}">Subdepartment </label> 
+        {{ form.subdepartmentchar }}
+        {% if form.subdepartmentchar.errors %}<ul class="errorlist">{{ form.subdepartmentchar.html_error_list }}</ul>{% endif %}
+        </p>
+        <p class="form-note">e.g. Laboratory for Global Marine and Atmospheric Chemistry</p>
+      
+        <p>
+        <label for="{{ form.address_line_1.get_id }}">Address line 1</label> 
+        {{ form.address_line_1 }}
+        {% if form.address_line_1.errors %}<ul class="errorlist">{{ form.address_line_1.html_error_list }}</ul>{% endif %}
+        </p>
+      
+        <p>
+        <label for="{{ form.address_line_2.get_id }}">Address line 2</label> 
+        {{ form.address_line_2 }}
+        {% if form.address_line_2.errors %}<ul class="errorlist">{{ form.address_line_2.html_error_list }}</ul>{% endif %}
+        </p>
+      
+      
+        <p>
+        <label for="{{ form.city.get_id }}">City</label> 
+        {{ form.city }}
+        {% if form.city.errors %}<ul class="errorlist">{{ form.city.html_error_list }}</ul>{% endif %}
+        </p>
+      
+        <p>
+        <label for="{{ form.postcode.get_id }}">Postal code</label> 
+        {{ form.post_code }}
+        {% if form.post_code.errors %}<ul class="errorlist">{{ form.post_code.html_error_list }}</ul>{% endif %}
+        </p>
+      
+        <p>
+        <label for="{{ form.country.get_id }}">Country</label> 
+        {{ form.country }}
+        {% if form.country.errors %}<ul class="errorlist">{{ form.country.html_error_list }}</ul>{% endif %}
+        </p>
+      
+        <p>
+        <label for="{{ form.phone.get_id }}">Telephone number</label> 
+        {{ form.phone }}
+        {% if form.phone.errors %}<ul class="errorlist">{{ form.phone.html_error_list }}</ul>{% endif %}
+        </p>
+        <p class="form-note">Please include international dialing code e.g. in the U.S. / Canada +1 123-456-789 or in the rest of the world e.g. +44 (0)1603 111222.</p>
+      
+      <!--<div class="form-line">
+        <label for="{{ form.newsletter.get_id }}">Annual newsletter</label> 
+        {{ form.newsletter }}
+        {% if form.newsletter.errors %}<ul class="errorlist">{{ form.newsletter.html_error_list }}</ul>{% endif %}
+      </div>
+      
+      <div class="form-line">
+        <label for="{{ form.bulletin.get_id }}">Regular bulletin</label> 
+        {{ form.bulletin }}
+        {% if form.bulletin.errors %}<ul class="errorlist">{{ form.bulletin.html_error_list }}</ul>{% endif %}
+      </div>
+      -->
+      <p>
+        <label for="{{ form.photo.get_id }}">Photo</label> 
+        {{ form.photo }} {{ form.photo_file }}
+        {% if form.photo.errors %}<ul class="errorlist">{{ form.photo.html_error_list }}</ul>{% endif %}
+      </p>
+      <p class="form-note">Image will be resized <i>down</i> to a maximum of 150 pixels 
+      wide and 200 pixels high. Relative proportions will be preserved </p>
+      
+        <p class="submit">
+        <input type="submit" value="Save">
+        </p>
+    </form>
+  </div>
+{% endblock %}  

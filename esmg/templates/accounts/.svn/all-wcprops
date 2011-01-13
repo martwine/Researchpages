@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/repos/apparatus/!svn/ver/559/templates/accounts
+END
+forgot.html
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/repos/apparatus/!svn/ver/559/templates/accounts/forgot.html
+END
+password_form.html
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/repos/apparatus/!svn/ver/514/templates/accounts/password_form.html
+END
+password_form_saved.html
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/repos/apparatus/!svn/ver/514/templates/accounts/password_form_saved.html
+END
+login.html
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/repos/apparatus/!svn/ver/511/templates/accounts/login.html
+END
+logout.html
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/repos/apparatus/!svn/ver/483/templates/accounts/logout.html
+END

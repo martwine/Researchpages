@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% load pdetails_extras %}
+{% load markup %}
+{% load home %}
+
+{% block title %}{{ person.name }}{% endblock %}
+{% block keywords %}{{person.keywords}}{% endblock %}
+{% block description %}{{person.description}}{% endblock %}
+
+
+{% block content %}
+
+  <div id="main">
+    {% if group %}
+      <h1>{{ person }}</h1>
+      <h3 class="indent">{{ person|get_role:group }}</h3>
+    {% endif %}
+      <div id="details">
+      <div id="photo">
+        {{ person.get_photo_html }}
+      </div>
+        <ul>
+          <li>{{person.subdepartmentchar}}</li>
+          <li>{{person.department}}</li>
+          {% if person.institution %}<li>{{person.institution}}</li>{% endif %}
+          {% for bit in person.address %}
+            <li>{{bit}}</li>
+          {% endfor %}
+          <li>{{person.phone}}</li>
+      </div>
+
+    <h1 class="person-home">{{ pagecontent.title }}</h1>
+    {{ pagecontent.body|textile }}
+    </div>
+
+  <div id="sidebar">
+    {% if user.is_staff or editor or addfriend %}
+      <div class="sidebar-block" id="actions">
+        <h2>Actions</h2>
+        <ul>
+      {% if editor %}
+        <li>{{ editlink }}</li>
+        <li>{{ createlink }}</li>
+        {% if groupnotpersonpage %}
+          <li><a href="{{ urlbase }}{{ page.uri }}sidebaradd/">Add a sidebar</a></li>
+        {% else %}
+          {% if group %}
+            <li><a href="{{ group.get_absolute_url }}{{ page.uri }}sidebaradd/">Add a sidebar</a></li>
+          {% else %}
+          <li><a href="{{ urlbase }}{{ page.uri }}sidebaradd/">Add a sidebar</a></li>
+          {% endif %}
+        {% endif %}
+        {% if user.is_superuser %}
+          {% if group %}
+            <li><a href="{{group.get_absolute_url}}/people/{{person.slug}}/details/edit/">Edit my details</a></li>
+          {% else %}
+            <li><a href="{{ person.get_edit_url }}">Edit my details</a></li>
+          {% endif %}
+        {% endif %}
+        {% ifequal user.person person%}
+          {% if group %}
+            <li><a href="{{group.get_absolute_url}}/people/{{person.slug}}/details/edit/">Edit my 
+                          details</a></li>
+              <li><a href="{{urlbase}}/publications/add/">Add a publication</a></li>
+              <li><a href="blog/post/">Add a blog post</a></li>
+              <li><a href="resources/add/">Upload a file</a></li>
+          {% else %}
+            <li><a href="{{ person.get_edit_url }}">Edit my
+                          details</a></li>
+              <li><a href="{{urlbase}}/publications/add/">Add a publication</a></li>
+              <li><a href="blog/post/">Add a blog post</a></li>
+              <li><a href="resources/add/">Upload a file</a></li>
+          {% endif %}
+        {% else %}
+        {% if user.person|is_group_leader:person %}
+            <li><a href="{{group.get_absolute_url}}/people/{{person.slug}}/details/edit/">Edit my 
+                          details</a></li>
+          {% endif %}
+        {% endifequal %}
+      {% endif %}
+      {% ifnotequal user.person person %}
+        {% if addfriend %}
+        <br>
+          <li><a href="{{urlbase}}/friend_request/{{person.slug}}/">Add {{person}} to my friends</a></li>
+        {% endif %}
+      {% endifnotequal %}
+       </ul>
+      </div>
+      {% endif %}
+    {% include "pagenav-snippet.html" %}
+    {% if person|count_other_groups:group %}
+      <div class="sidebar-block">
+        <h2>{{ person }} is {% if group %}also{% endif%} a member of:</h2>
+        <ul>
+            {% for membership in person|get_other_groups:group %}
+              <li><a href="{{membership.group.get_absolute_url}}">{{membership.group}}</a></li>
+            {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {% if person.pubcount %}
+      <div class="sidebar-block">
+        <h2>{{ person }}'s Latest Publications</h2>
+        <ul>
+          <li style="text-align:right;"><a href="publications/">(See all)</a></li>
+          {% for publication in person.latestpublications %}
+          {% if group %}
+          <li class="pubtitle"><a href="{{group.get_absolute_url}}/publications/{{ publication.id }}">{{ publication.title }}</a></li>
+          {% else %}
+          <li class="pubtitle"><a href="{{ publication.get_absolute_url }}">{{ publication.title }}</a></li>
+          {% endif %}
+            <li class="authors">{{ publication }}</li>
+            <li class="journal">{{publication.details}}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {% if person.editorship_set.count %}
+      <div class="sidebar-block">
+        <h2>{{ person }}'s editorships</h2>
+        <ul>
+          {% for edit in person.editorship_set.all %}
+            <li class="clearlist"><a href="{{ edit.get_absolute_url }}">{{ edit.publication }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    
+  {% for sbjoin in page.sidebarjoin_set.all %}
+    <div class="sidebar-block">
+      <h2>{{ sbjoin.sidebar.name }}</h2>
+
+      {{ sbjoin.sidebar.body|textile }}
+
+      {% if editor %}
+          <ul class="sidebar-actions">
+            {% if user.is_staff or user.is_superuser %}
+              <li><a href="{{ sbjoin.sidebar.get_edit_url }}?from={% if person %}{% if group %}{{ group.get_absolute_url }}{{ page.uri }}{% else %}{{ person.get_absolute_url }}{% endif %}{% else %}{{ page.get_absolute_url }}{% endif %}">Edit</a></li>
+            {% else %}
+            {% ifequal user.id sbjoin.sidebar.creator_id %}
+                <li><a href="{{ sbjoin.sidebar.get_edit_url }}?from={% if person %}{% if group %}{{ group.get_absolute_url }}{{ page.uri }}{% endif %}{% else %}{{ page.get_absolute_url }}{% endif %}">Edit</a></li>
+              {% endifequal %}
+            {% endif %}
+            <li><a href="{{ page.get_absolute_url }}sidebarremove/{{ sbjoin.sidebar.id }}/">Remove</a></li>
+          </ul>
+      {% endif %}
+    </div>
+    {% endfor %}
+    <!--{% for sidebar in page.sidebarjoin_set.all %}
+      <div class="sidebar-block"> 
+        {{ sidebar.body|textile }}
+      </div>
+      {% endfor %}-->
+  </div>
+  <div id="footer">
+  {% if pagecontent %}
+    Last updated at {{ pagecontent.time|date:"G:i" }} on
+    {{ pagecontent.time|date:"d/m/Y" }} by
+    {% if group %}
+    <a href="{{group.get_absolute_url}}/people/{{pagecontent.last_editor.slug}}/">{{ pagecontent.last_editor }}</a>.
+    {% else %}
+    <a href="{{ pagecontent.last_editor.get_absolute_url }}">{{ pagecontent.last_editor }}</a>.
+    {% endif %}
+  {% endif %}
+  </div>
+{% endblock %}
+

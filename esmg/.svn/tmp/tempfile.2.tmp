@@ -1,0 +1,84 @@
+from django.conf.urls.defaults import *
+from esmg.publications.models import Publication
+from esmg.resources.models import Resource
+from esmg.institutions.models import Institution
+
+#handler500 = "django.views.server_error"
+
+resource_add_dict = {"model": Resource, "login_required": True,
+        "post_save_redirect": "../%(id)s/info/"}
+
+
+info_dict = {
+    'paginate_by':  8,
+    'allow_empty':  True,
+}
+
+urlpatterns = patterns('',
+    (r'^admin/', include('django.contrib.admin.urls')),
+    (r'^publications/', include('esmg.publications.urls')),
+    (r'^people/', include('esmg.people.urls')),
+    (r'^projects/', include('esmg.groups.urls')),
+    (r'^news/', include('esmg.comms.urls')),
+    (r'^resources/', include('esmg.resources.urls')),
+    (r'^search/$', 'esmg.views.search'),
+<<<<<<< .mine
+    (r'^institutions/add/$', 'django.views.generic.create_update.create_object', dict(model='Institution')),
+=======
+    (r'^institutions/add/$', create_object, {'model':'Institution'}),
+>>>>>>> .r382
+    (r'^accounts/login/$', 'django.contrib.auth.views.login', 
+            {'template_name': 'accounts/login.html'}),
+    (r'^accounts/logout/$', 'django.contrib.auth.views.logout',
+            {'template_name': 'accounts/logout.html'}),
+    (r'^accounts/forgotpassword/$', 'esmg.people.views.password_forgot',
+            {'template_name': 'accounts/forgot.html'}),
+    #get group-specific app pages and forward them on to app urls as appropriate
+    (r'^(?P<group>[\w-]+)/publications/$',
+        'esmg.publications.views.grouppub'),
+    (r'^(?P<group>[\w-]+)/publications/', include('esmg.publications.urls')),
+    (r'^(?P<group>[\w-]+)/resources/$',
+        'esmg.resources.views.list', dict(type="group_list")),
+    (r'^(?P<group>[\w-]+)/resources/search/$',
+        'esmg.resources.views.search'),
+    (r'^(?P<group>[\w-]+)/publications/search/$',
+        'esmg.publications.views.search'),
+    (r"^(?P<group>[\w-]+)/resources/add/$", 
+        'esmg.resources.views.create_resource'),
+    (r'^(?P<group>[\w-]+)/people/', include('esmg.people.urls')),
+    
+    #(r'^(?P<group>[\w\-/]+)/news/$',
+    #    include('esmg.comms.urls')),
+    #(r'^(?P<group>[\w\-/]+)/search/$', 'esmg.views.search',
+    #    dict(groupsearch=True)),
+    
+    # catch all sends to CMS
+    (r'^sidebars/(?P<sidebar>[\d]+)/edit/$',
+        'esmg.apparatus.views.editsidebar'),
+    (r'^sidebars/create/$',
+        'esmg.apparatus.views.createsidebar'),
+    (r'^(?P<uri>[\w\-/]+)/edit/$', 'esmg.apparatus.views.editpage',
+        dict(create=False)),
+    (r'^(?P<uri>[\w\-/]+)/delete/$', 'esmg.apparatus.views.deletepage'),
+    (r'^(?P<uri>[\w\-/]+)/move/$', 'esmg.apparatus.views.movepage'),
+    (r'^(?P<uri>[\w\-/]+)/versions/(?P<version>\d+)/$',
+        'esmg.apparatus.views.versions'),
+    (r'^(?P<uri>[\w\-/]+)/sidebaradd/$', 'esmg.apparatus.views.addsidebar'),
+    (r'^(?P<uri>[\w\-/]+)/sidebarremove/(?P<sidebar>[\d]+)/$', 'esmg.apparatus.views.removesidebar'),
+    (r'^(?P<uri>[\w\-/]+)/create/$', 'esmg.apparatus.views.editpage',
+        dict(create=True)),
+    (r'^edit/$', 'esmg.apparatus.views.editpage', dict(uri='/', 
+        create=False)),
+    (r'^create/$', 'esmg.apparatus.views.editpage', dict(uri='/',
+        create=True)),
+    (r'^sidebaradd/$', 'esmg.apparatus.views.addsidebar', dict(uri='/')),
+    (r'^sidebarremove/(?P<sidebar>[\d]+)/$', 'esmg.apparatus.views.removesidebar', dict(uri='/')),
+    (r'^delete/$', 'esmg.apparatus.views.deletepage', dict(uri='/')),
+    (r'^move/$', 'esmg.apparatus.views.movepage', dict(uri='/')),
+    (r'^versions/(?P<version>\d+)/$', 'esmg.apparatus.views.versions',
+        dict(uri='/')),
+	#added this line to catch non home or people page CMS pages (where did they go before?)
+    (r'^(?P<uri>[\w\-/]+)/$', 'esmg.apparatus.views.page'),
+    (r'^$', 'esmg.apparatus.views.page', dict(uri='/')),
+)
+

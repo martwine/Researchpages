@@ -1,0 +1,934 @@
+from time import time
+from datetime import datetime
+
+from django.utils.encoding import smart_unicode
+from django import forms, newforms
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.db.models import Q
+from django.http import Http404, HttpResponseRedirect
+from django.shortcuts import render_to_response, get_object_or_404
+from django.template import RequestContext
+from django.utils.translation import gettext_lazy
+
+from afternoon.django.errors.views import error
+
+from esmg.apparatus.models import Page, PageContent, Sidebar, Sidebarjoin, Tree
+from esmg.people.models import Person
+from esmg.groups.models import Group, Membership
+
+
+
+# page views retrieves the page based on the uri (from {{URLBASE}}/urls.py).
+# Special cases are uri='/', i.e. root page of whole site, personpages (the top
+# of person tree and subpages thereof.)
+# people/urls.py sends personpage=True when url is of the form
+# /people/person-name/ and personsubpage=True when url is
+# /people/person-name/pagename/
+def page(request, **kwargs):
+    personpage = kwargs.get("personpage", False)
+    personsubpage = kwargs.get("personsubpage", False)
+    group = kwargs.get("group", False)
+    #if top level person page
+    if personpage:
+        ppage = True #is person page
+        ptop = True #is person tree top
+    #else if anywhere below top page in person tree
+    elif personsubpage:
+        ppage = True
+        ptop = False
+    else:
+        ppage = ptop = False
+
+#get or create page object
+    if not ptop: #if not person page and tree top
+        uri = kwargs.get("uri")
+        # if not root page of whole site add slashes to uri
+        if not uri=="/":
+            uri = "/" + uri + "/"
+        #catch person subpages:
+        if ppage:
+            uri='/people' + uri
+        try: #try to retreive the page
+            page = get_object_or_404(Page, uri=uri, disabled=False)
+        except Http404, e:
+        # if that doesnt work
+            # redirect to root page creation if it's missing
+            if uri == "/":
+                return  HttpResponseRedirect(settings.URLBASE + "/create/")
+            #otherwise try to find parent page and retrieve it
+            else:
+                editor = url = None
+                uriparts = uri.split("/")
+                parent_uri = "/".join(uriparts[:-2]) + "/"
+                if not request.user.is_anonymous():
+                    # find a parent by removing last component of path info
+                    try:
+                        parent = Page.objects.get(uri=parent_uri, disabled=False)
+                        editor = parent.is_editor(request.user)
+                        url = parent.get_absolute_url()
+                    except Page.DoesNotExist:
+                        pass
+            #return 404 if page retrieval is unsuccessful
+            return render_to_response("404.html", RequestContext(request,
+                    {"editor": editor, "parent_url": settings.URLBASE + parent_uri}))
+    else: #if top of person tree
+        slug = kwargs.get("slug")
+        try: #get page or 404
+            page = get_object_or_404(Page, identifier=slug, disabled=False)
+        except Http404, e:
+            return render_to_response("404.html")
+    
+    #check permissions for private pages
+    if page.private:
+        if request.user.is_anonymous():
+            permission=False
+        else:
+            u = request.user
+            if page.tree.type=='group':
+                permission = Membership.objects.filter(person=u.person,
+                        group=page.tree.group).count()>0 or u.is_superuser
+            elif page.tree.type=='person':
+                permission = page.tree.person == u.person or u.is_superuser
+            else:
+                permission = u.is_superuser
+        if not permission:
+            return error(request, "You do not have the appropriate permissions \
+                    to view this page")
+
+    #try to get latest pagecontent for retrieved page
+    try: 
+        pagecontent = page.pcontent.latest()
+    except PageContent.DoesNotExist: 
+        #if top of person tree set pagecontent to ''
+        if ptop:
+            pagecontent = ''
+        #Otherwise redirect to the edit page for that page 
+        #i.e. ptop pages should be
+        #viewable even in the absence of CMS content
+        else:    
+            return  HttpResponseRedirect(page.get_absolute_url() + "edit/")
+    #get children for listing during page render
+    try: children = page.child_set.filter(disabled=False)
+    except: children = False 
+
+    edit = create = delete = move = person = editor = ""
+   
+    #groupise for css NOTE - need to pass another context variable to group
+    #pages to override group-based links as group identifier exists in URI of
+    #standard group pages )
+    if group:
+        g = Group.objects.get(acronym=group)
+        groupnotpersonpage = False
+    elif page.tree.type == 'group':
+        g = page.tree.group
+        groupnotpersonpage = True
+    else:
+        g = False
+        groupnotpersonpage = False
+    
+    #if not request.user.is_anonymous() and page.is_editor(request.user):
+    
+    url = page.get_absolute_url()
+    if ppage and group:
+        url = g.get_absolute_url() + page.uri
+    
+    #set up edit create delete and move page links
+    edit = "<a href=\"%sedit/\">Edit this page</a>" % url
+    create = "<a href=\"%screate/\">New page</a>" % url
+    #allow delete except for any tree tops
+    if not page.is_tree_top:
+        delete = "<a href=\"%sdelete/\">Delete page</a>" % url
+    #allow move for all pages except treetops and personpager 
+    if not (page.is_tree_top or page.is_person_page):
+        move = "<a href=\"%smove/\">Move page</a>" % url
+   #get person if persontoppage
+    if ptop:
+        person = get_object_or_404(Person, slug=kwargs["slug"])
+        
+    elif personsubpage:
+        person = page.tree.person    
+
+    #check permissions
+    editor = page.is_editor(request.user)
+    
+
+    #if a persnal page under a group url (e.g. /<group>/people/<person>/<page>),
+    #make sure person is a group member:
+    
+    if g and ppage and Membership.objects.filter(person=person,
+            group=g).count()<1:
+        #otherwise return 404
+        return render_to_response("404.html", RequestContext(request,
+                {"editor": editor}))
+                #{"editor": editor, "parent_url": settings.URLBASE + parent_uri}))
+
+    #get data fror whether or not to add a addfriend link to people page
+    if ptop and not request.user.is_anonymous():
+        uper = request.user.person
+        if uper.friends.all().count() == 0:
+            addfriend = True
+        else:
+            addfriend = not person in uper.friends.all()
+    else:
+        addfriend = False
+            
+    
+    #get css
+    if page:
+        if g:
+            css = g.defaultcss
+            logo = g.get_logo_url()
+            groupchildren = g.children()
+        else:
+            css = page.get_css()
+            logo = page.get_logo()
+            groupchildren = False
+        
+    else:
+        css = settings.DEFAULT_CSS
+        logo = settings.DEFAULT_LOGO
+    
+    if ppage:
+        personchildren = Page.objects.get(is_tree_top=True,
+                tree__person=person).child_set.filter(disabled=False)
+    else:
+        personchildren=False
+    #put together page context 
+    ctx = {
+        "page":         page,
+        "pagecontent":  pagecontent,
+        "editlink":     edit,
+        "createlink":   create,
+        "movelink":     move,
+        "deletelink":   delete,
+        "children":     children,
+        "person":       person,
+        "editor":       editor,
+        "css":          css,
+        "logo":			logo,
+        "group":        g,
+        "addfriend":    addfriend,
+        "groupchildren": groupchildren,
+        "personchildren": personchildren,
+        "groupnotpersonpage": groupnotpersonpage,
+    }
+    
+    #select templates
+    if page.uri == "/":
+        template = "apparatus/index.html"
+    elif ptop:
+        template = "people/person_detail.html"
+    elif personsubpage:
+        template = "people/personpage.html"
+    elif not page.tree.group:
+        template = "apparatus/apparatus.html"
+    else:
+        template = "apparatus/grouppage.html"
+
+    #render the page
+    return render_to_response(template, RequestContext(request, ctx))
+
+
+class EditPageManipulator(forms.Manipulator):
+    def __init__(self):
+        editors = Person.objects.all()
+        choices = [('','-----------')] + [(c.user_id, c.name()) for c in editors]
+        self.fields = (
+            forms.TextField(field_name="identifier"),
+            forms.SelectField(field_name="editor_id", is_required=True,
+                choices = choices),
+            forms.SelectField(field_name="subeditor_id", is_required=False,
+                choices = choices),
+            forms.SelectField(field_name="subeditor2_id", is_required=False,
+                choices = choices),
+            forms.CheckboxField(field_name="private"),
+            forms.TextField(field_name="title", is_required=True),
+            forms.LargeTextField(field_name="body", is_required=True),
+        )
+
+
+class EditHomePageManipulator(forms.Manipulator):
+    def __init__(self):
+        self.fields = (
+            forms.TextField(field_name="title", is_required=True),
+            forms.LargeTextField(field_name="body", is_required=True),
+        )
+
+
+class MovePageManipulator(forms.Manipulator):
+    def __init__(self, movingpage):
+        choices = []
+        p = Page.objects.get(uri ='/')
+        choices.append((p.id, '/'))
+        indent = '- '
+        treelist(indent,p.id,movingpage,choices)
+        self.fields = (
+            forms.SelectField(field_name="parent_id", choices = choices),
+        )
+
+
+def treelist(indent,page,movingpage,choices):
+    p = Page.objects.get(id=page)
+    pages = p.child_set.all().exclude(id=movingpage).exclude(disabled=True)
+    for child in pages:
+        choices.append((child.id, indent + child.identifier))
+        indenter = indent + '- '
+        treelist(indenter,child.id,movingpage,choices)
+    return choices
+
+
+def basetemplatelinks(context):
+    try:
+        p = Page.objects.get(uri='/')
+        topchildren = p.child_set.exclude(disabled=True)
+        return {'topchildren': topchildren}
+    except Page.DoesNotExist:
+        return {}
+
+
+@login_required    
+def editpage(request, **kwargs):
+    #identify pages from a person tree from kwargs (see people/urls.py)
+    personpage = kwargs.get("personpage", False)
+    personsubpage = kwargs.get("personsubpage", False)
+    ppage = personpage or personsubpage
+    group = kwargs.get("group", False)
+    g = False
+    if group:
+        g = Group.objects.get(acronym=group)
+    
+    #get user
+    u = request.user
+
+    #get page uri and create flag from kwargs
+    uri, create = kwargs["uri"], kwargs["create"]
+
+    #if we're editing the root page uri from kwargs is '/' and create flag is
+    #False
+    home = kwargs["uri"] == '/' and not create
+    #else, if we're creating the root page... (probably never used)
+    homecreate = kwargs["uri"] == '/' and create and \
+            Page.objects.filter(uri='/').count() == 0 
+    #munge the kwargs uris to match the ones stored in the Page database
+    if uri != '/':
+        if ppage:
+            uri = "/people/" + uri + "/"
+        else:
+            uri = "/" + uri + "/"
+    
+    #if we're not creating the root page try to get the page
+    if not homecreate:
+        try: 
+            p = Page.objects.get(uri=uri, disabled=False)
+        except Page.DoesNotExist: return error(request, "The page you are trying to\
+                edit does not exist, or has been disabled.")
+    
+    #try to get group another way
+    group_acronym = p.uri.strip('/').split('/')[0]
+    try:
+        g = Group.objects.get(acronym=group_acronym)
+    except:
+        pass
+    if g:
+        group=True
+    #if we are creating the home page ther is no page and no parent
+    if homecreate:
+        parenturi = False
+        p = False
+    #if we're creating any other page assign kwargs uri to parenturi
+    elif create:
+        parenturi = uri
+    #otherwise if the page has a parent assign parenturi accordingly 
+    elif p.parent:
+        parenturi = p.parent.uri
+    #else (this applies to tree tops) parenturi is false
+    else:
+        parenturi = False
+    
+    #check permissions for homecreate
+    if (homecreate and not u.is_superuser) or \
+            (not u.is_superuser and (p and not p.is_editor(u))):
+        return error(request, "You do not have the appropriate permissions \
+                to edit this page")
+    
+    #set pagecontent to none
+    pagecontent = None
+    
+    #if we aren't creating a page then try to get the latest pagecontent
+    if p:
+        try:
+            pagecontent = p.pcontent.latest()
+        except PageContent.DoesNotExist:
+            pass
+
+    # Are we creating a page under the personal home page of the current user?
+    if ppage:
+        mine = p.is_person_page and \
+                p.editor_id == request.user.get_profile().user_id
+        personcreate = create and mine
+        personhome = not create and mine and p.is_tree_top
+    else:
+        personcreate = personhome = False
+
+    if (p.is_tree_top and not create) or homecreate:
+        #use root page manipulator
+        manipulator = EditHomePageManipulator()
+    else:
+        manipulator = EditPageManipulator()
+
+    
+    #define grouphome
+    if group and p.is_tree_top:
+        grouphome = True
+    else:
+        grouphome = False
+    
+    if request.POST:
+        new_data = request.POST.copy()
+        
+        #is this a preview?
+        if new_data['submit'] == 'Preview':
+            preview = True
+        else:
+            preview = False
+        
+        #if not creating then set the page to be edited
+        if not create:
+            new_data['page'] = p.id
+        
+        #set the editor id
+        new_data['last_editor'] = u.id
+
+        #if home or creating home, need to pass editor to avoid errors (I wonder
+        #why this didn't break before)
+
+        if homecreate:
+            u = User.objects.filter(is_superuser=True)[0]
+            new_data['editor_id'] = u.id
+        if home:
+            new_data['editor_id'] = p.editor_id
+        if personhome:
+            new_data['editor_id'] = p.editor_id
+        if grouphome:
+            new_data['editor_id'] = p.editor_id
+
+        errors = manipulator.get_validation_errors(new_data)
+        
+        if homecreate or home:
+            identifier = ''
+        else:
+            if not create and p.is_tree_top and not p.is_person_page:
+                identifier = ''
+            elif p.is_person_page and p.is_tree_top and not create:
+                identifier = p.identifier
+            else:
+                identifier = new_data['identifier'].lower()
+                    
+                if not p.is_tree_top and identifier == '':
+                    errors.setdefault('identifier', []).append(gettext_lazy('You \
+                            must specify an identifier'))
+        
+        # test that identifier is unique
+        uniquelookup = {"disabled": False}
+        if homecreate:
+            uniquelookup["parent__isnull"] = True
+            uniquelookup["tree__identifier"] = '/'
+        elif p.is_tree_top and not create:
+            uniquelookup["tree__identifier"] = p.tree.identifier
+            uniquelookup["parent__isnull"] = True
+        else:
+            uniquelookup["parent__uri"] = parenturi
+        uniquelookup["identifier"] = identifier
+        idcount = Page.objects.filter(**uniquelookup).count()
+        
+        # idtest false if tests for uniqueness fail
+        idtest = True
+        if create:
+            idtest = idcount == 0
+        else:
+            if p and identifier == p.identifier:
+                idtest = idcount == 1
+            else:
+                idtest = idcount == 0
+            
+        #if not idtest: 
+        #    errors.setdefault('identifier', []).append(gettext_lazy('A page '
+        #        'with identifier %s already exists in this position' %
+        #        identifier))
+        
+        if uri == '/' and create and \
+                (identifier in settings.RESERVED_IDENTIFIERS):
+            errors.setdefault('identifier', []).append(gettext_lazy("This"
+                    " identifier is reserved. Reserved identifiers are \"%s\" and"
+                    " \"%s.\"" % \
+                    (",\" \"".join(settings.RESERVED_IDENTIFIERS[:-1]),
+                    settings.RESERVED_IDENTIFIERS[-1])))
+        
+        if not errors: #if all verifications pass
+            if not preview: #final form submission
+                manipulator.prepare(new_data)
+                manipulator.do_html2python(new_data)
+
+                # create/save page object
+                if create:
+                    if p: #parent id if page sucessfully retrieved above
+                        pid = p.id
+                        tree = p.tree
+                    else:
+                        pid = None
+                    if homecreate:
+                        tree=Tree(type='top', identifier='', group=None, \
+                                person=None )
+                        tree.save()
+                    newpage = Page(
+                            identifier=identifier, 
+                            tree=tree,
+                            editor_id=request.user.id,
+                            subeditor_id=new_data['subeditor_id'],
+                            subeditor2_id=new_data['subeditor2_id'],
+                            parent_id=pid,
+                            private=new_data['private'], 
+                            disabled=False
+                            )
+                    if p:
+                        newpage.is_tree_top=0
+                    if p.is_person_page:
+                        newpage.is_person_page=1
+                    newpage.save()
+                else:
+                    p.identifier = identifier.lower()
+                    if not (home or personhome or grouphome):
+                        p.editor_id = new_data['editor_id']
+                        p.subeditor_id = new_data['subeditor_id']
+                        p.subeditor2_id = new_data['subeditor2_id']
+                    else:
+                        if grouphome and not p.editor_id:
+                            p.editor_id = p.tree.group.editor.user_id
+                    if p.is_tree_top:
+                        p.private = False
+                    else:
+                        p.private = new_data['private'] 
+                    p.locked_by = False
+                    p.save()
+                    #get time since last edit
+                    try:
+                        deltat = datetime.now()-p.pcontent.latest().time
+                        deltasecs = deltat.days*24*60*60 + deltat.seconds
+                    except:
+                        deltasecs=50000
+                #save new pagecontent
+                title = new_data['title']
+                body = new_data['body']
+                if create:
+                    id = newpage.id
+                else:    
+                    id = p.id
+                
+                pc = PageContent(page_id=id, title=title, body=body,
+                        last_editor_id=u.id)
+                pc.save()
+                if create: 
+                    newpage.send_notification('new')
+                else:
+                    if deltasecs > 43200:
+                        p.send_notification('update')
+
+                if group:
+                    if create:
+                        return HttpResponseRedirect(settings.URLBASE +
+                                uri + identifier)
+                    elif p:
+                        return HttpResponseRedirect(settings.URLBASE +
+                                uri)
+                    else:
+                        return HttpResponseRedirect(settings.URLBASE + g.acronym + '/')
+                else:
+                    if create:
+                        return HttpResponseRedirect(settings.URLBASE + uri +
+                                identifier)
+                    elif p:
+                        return HttpResponseRedirect(p.get_absolute_url())
+                    else:
+                        return HttpResponseRedirect(settings.URLBASE + '/')
+                    
+            else: #preview form
+                form = forms.FormWrapper(manipulator, new_data, errors)
+
+                if p:
+                    pid = p.id
+                    if group:
+                        css = g.defaultcss 
+                    else:
+                        css = p.get_css()
+                        g = False
+                else:
+                    pid = "_new"
+                    css = settings.DEFAULT_CSS
+                    
+                request.session["page%s_title" % pid] = new_data['title']
+                request.session["page%s_body" % pid] = new_data['body']
+                return render_to_response('apparatus/editform.html',
+                        {'form': form, 'page': p, 'css': css, 'pagecontent': pagecontent,
+                        'create': create, 'preview': preview,
+                        'title': new_data["title"], 'body': new_data["body"],
+                        'home': home, 'homecreate': homecreate,
+                        "personcreate": personcreate, "personhome": personhome,
+                        "grouphome": grouphome, "group": g, "personpage":ppage},
+                        RequestContext(request))
+    
+    else: #first view of edit / create page i.e. no request.POST
+        if not create:
+            if not p.locked_by or time() - float(p.locked_time) > 200 or (p.locked_by and p.locked_by_id == u.id):
+                p.locked_by_id = u.id
+                p.locked_time = int(time()) 
+                p.save()
+            else:
+                return error(request, "This page is currently being edited by " +
+                        smart_unicode(p.locked_by) + ". Please try again later")
+            if pagecontent:
+                new_data = pagecontent.__dict__
+            else:
+                new_data = {"editor_id": request.user.get_profile().user_id}
+            new_data.update(p.__dict__)
+        else:
+           new_data = {"editor_id": request.user.get_profile().user_id,
+                    "private": p.private}
+        errors = {}
+
+    form = forms.FormWrapper(manipulator, new_data, errors)
+    
+       #get css
+    if p and not create:
+        if group:
+            css = g.defaultcss
+            logo = g.get_logo_url()
+        elif p.tree.type == "group":
+            gr = p.tree.group
+            css = gr.defaultcss
+            logo = gr.get_logo_url()
+            g = gr
+        else:
+            css = p.get_css()
+            logo = p.get_logo()
+            g = False
+        
+    else:
+        css = settings.DEFAULT_CSS
+        logo = settings.DEFAULT_LOGO
+        g = False
+
+
+    return render_to_response('apparatus/editform.html', {'form': form,
+            'page': p, 'css': css, 'logo':logo, 'pagecontent': pagecontent, 'create': create, 
+            'home': home, 'homecreate': homecreate, "errors": errors,
+            "personcreate": personcreate, "personhome": personhome, "grouphome":
+            grouphome, "group": g, "personpage": ppage,},
+            RequestContext(request))
+
+
+@login_required
+def versions(request, **kwargs):
+    personpage = kwargs.get("personpage", False)
+    personsubpage = kwargs.get("personsubpage", False)
+    group = kwargs.get("group", False)
+    if personpage or personsubpage:
+        ppage = True
+    else: ppage = False
+    if not kwargs["uri"] == '/':
+        if ppage:
+            uri = "/people/" + kwargs["uri"] + "/"
+        else:
+            uri = "/" + kwargs["uri"] + "/"
+    else:
+        uri = kwargs["uri"]
+    try: 
+        p = Page.objects.get(uri=uri, disabled=False)
+    except Page.DoesNotExist: return error(request, "Page object "
+            "could not be found")
+    
+    version = kwargs.get("version")
+    if version:
+        try:
+            pc = p.pcontent.get(version=version)
+        except PageContent.DoesNotExist:
+            return error(request, "Page version does not \ exist")
+
+    u = request.user
+    if u.is_superuser or p.is_editor(u):
+        if request.POST:
+            #save new pagecontent
+            title = pc.title
+            body = pc.body
+            id = p.id
+            pagecontent = PageContent(page_id=id, title=title, body=body,
+                    last_editor_id=u.id)
+            pagecontent.save()
+            if group:
+                return HttpResponseRedirect(settings.URLBASE + '/' + group + uri)
+            else:
+                return HttpResponseRedirect(settings.URLBASE + uri)
+        
+        else:
+            if group:
+                g = Group.objects.get(acronym=group)
+                css = g.defaultcss
+                logo = g.get_logo_url()
+            else:
+                css = p.get_css()
+                logo = p.get_logo()
+                g = False
+        
+            return render_to_response('apparatus/versionconfirm.html', {'page': p, 
+                    'css': css, 'logo': logo, 'pagecontent': pc, 'group': g,
+                    'personpage': ppage }, RequestContext(request))
+    else: 
+        return error(request, "You do not have the appropriate permissions \
+                to edit this page")
+
+
+@login_required    
+def movepage(request, **kwargs):
+    personpage = kwargs.get("personpage", False)
+    personsubpage = kwargs.get("personsubpage", False)
+    if personpage or personsubpage:
+        ppage = True
+    else: ppage = False
+    if not kwargs["uri"] == '/' and not ppage:
+        uri = "/" + kwargs["uri"] + "/"
+    else:
+        return error(request, "This page cannot be moved")
+
+    try:
+        p = Page.objects.get(uri=uri, disabled=False)
+    except Page.DoesNotExist: return error(request, "Page object "
+            "could not be found")
+    
+    u = request.user
+    if u.is_superuser or p.is_editor(u):
+        manipulator = MovePageManipulator(p.id)
+        if request.POST:
+            new_data = request.POST.copy()
+            manipulator.do_html2python(new_data)
+            parent_id = new_data['parent_id']
+            if not p.parent_id == parent_id:
+                p.parent_id = parent_id
+            p.locked_by = False
+            p.save()
+            return HttpResponseRedirect(settings.URLBASE + p.parent.uri +
+                    p.identifier)
+        
+        else:
+            if not p.locked_by or time() - float(p.locked_time) > 200 or p.locked_by_id == u.id:
+                p.locked_by_id = u.id
+                p.locked_time = int(time()) 
+                p.save()
+            else: 
+                return error(request, "This page is currently being edited by " +
+                        smart_unicode(p.locked_by) + ". Please try again later")
+        
+            new_data = p.__dict__
+            errors={}
+        form = forms.FormWrapper(manipulator, new_data, errors)
+        return render_to_response('apparatus/moveform.html', 
+                {'form': form, 'page': p, 'css': p.get_css(), 'logo': p.get_logo()}, RequestContext(request))
+    
+    else:
+        return error(request, "You do not have the appropriate permissions \
+                to move this page")
+    
+        
+@login_required
+def deletepage(request, **kwargs):
+    personpage = kwargs.get("personpage", False)
+    personsubpage = kwargs.get("personsubpage", False)
+    if personpage:
+        ppage = True
+        ptop = True
+    elif personsubpage:
+        ppage = True
+        ptop = False
+    else:
+        ppage = ptop = False
+    if not kwargs["uri"] == '/' and not ptop:
+        if ppage:
+            uri = "/people/" + kwargs["uri"] + "/"
+        else:
+            uri = "/" + kwargs["uri"] + "/"
+    else:
+        return error(request, "This page cannot be deleted")
+
+    try:
+        p = Page.objects.get(uri=uri, disabled=False)
+    except Page.DoesNotExist: return error(request, "Page object "
+            "could not be found")
+
+    u = request.user
+    if u.is_superuser or p.is_editor(u):
+        if request.POST:
+            p.disabled = True
+            p.locked_by = False
+            p.save()
+            return HttpResponseRedirect(settings.URLBASE + p.parent.uri)
+        
+        else:
+            if not p.locked_by or time() - float(p.locked_time) > 200 or p.locked_by_id == u.id:
+                p.locked_by_id = u.id
+                p.locked_time = int(time()) 
+                p.save()
+            else: 
+                return error(request, "This page is currently being edited by " +
+                        smart_unicode(p.locked_by) + ". Please try again later")
+            
+    
+        return render_to_response('apparatus/deleteform.html', 
+                {'page': p, 'css': p.get_css(), 'logo': p.get_logo}, RequestContext(request))
+    
+    else:
+        return error(request, "You do not have the appropriate permissions \
+                to delete this page")
+
+
+def removesidebar(request, **kwargs):
+    personpage = kwargs.get("personpage", False)
+    personsubpage = kwargs.get("personsubpage", False)
+    if personpage or personsubpage:
+        ppage = True
+    else: ppage = False
+    if not kwargs["uri"] == '/':
+        home = False
+        if ppage:
+            uri = "/people/" + kwargs["uri"] + "/"
+        else:
+            uri = "/" + kwargs["uri"] + "/"
+    else:
+        uri = kwargs["uri"]
+        home = True
+    rg = request.GET.get
+    try: p = Page.objects.get(uri=uri, disabled=False)
+    except Page.DoesNotExist: return error(request, "Page object "
+            "could not be found")
+    try: s = Sidebar.objects.get(id=kwargs["sidebar"])
+    except Sidebar.DoesNotExist: return error(request, "Sidebar does not exist")
+    u = request.user
+    if s.is_editor(request.user):
+        join = Sidebarjoin.objects.get(page__uri__exact=p.uri,
+                sidebar__name__exact=s.name)
+        join.delete()
+        return HttpResponseRedirect(settings.URLBASE + uri)
+    
+    else:
+        return error(request, "You are not authorised to perform this action")
+
+
+def addsidebar(request, **kwargs):
+    personpage = kwargs.get("personpage", False)
+    personsubpage = kwargs.get("personsubpage", False)
+    if personpage or personsubpage:
+        ppage = True
+    else: ppage = False
+    if not kwargs["uri"] == '/':
+        home = False
+        if ppage:
+            uri = "/people/" + kwargs["uri"] + "/"
+        else:
+            uri = "/" + kwargs["uri"] + "/"
+    else:
+        uri = kwargs["uri"]
+        home = True
+    try: p = Page.objects.get(uri=uri, disabled=False)
+    except Page.DoesNotExist: return error(request, "Page object "
+            "could not be found")
+
+    #get a list of the user's groups
+    persongroups = Group.objects.filter(membership__person=request.user.person)
+    pgrouplist = [pgl for pgl in persongroups]
+    
+    #filter to get sidebars
+    sidebars = Sidebar.objects.filter(group__in=pgrouplist) | Sidebar.objects.filter(creator=request.user.person)
+    
+
+    
+    #find sidebars associated with page
+    sj = Sidebarjoin.objects.filter(page=p)
+    #create list for filtering against to find unassociated sidebars
+    s_assoc = [s.sidebar.id for s in sj]
+
+    if s_assoc:
+        s_unassoc = sidebars.exclude(id__in=s_assoc)
+    else:
+        s_unassoc = sidebars
+    
+    u = request.user
+    if u.is_superuser or p.is_editor(u):
+        if request.META["REQUEST_METHOD"] == "POST":
+            new_data = request.POST.copy()
+            for sid in new_data.keys():
+                q = Sidebar.objects.get(pk=sid)
+                join = Sidebarjoin(page=p, sidebar=q)
+                join.save()
+                     
+            return HttpResponseRedirect(settings.URLBASE + uri) 
+        else:
+            return render_to_response('apparatus/addsidebarform.html', 
+                    {'page': p, 'sidebars': s_unassoc, 'no_sidebars':
+                    Sidebar.objects.count()}, RequestContext(request))
+    else:
+        return error(request, "You do not have the appropriate permissions \
+                to edit this page")
+        
+   
+def createsidebar(request):
+    rg = request.GET.get
+    sender = rg("from","")
+    manipulator = Sidebar.AddManipulator()
+    membership = request.user.person.membership_set.all()
+
+    if request.POST:
+        new_data = request.POST.copy()
+
+        errors = manipulator.get_validation_errors(new_data)
+
+        if not errors:
+            manipulator.do_html2python(new_data)
+            manipulator.save(new_data)
+
+            return HttpResponseRedirect(sender)
+    else:
+        errors = new_data = {}
+
+    form = forms.FormWrapper(manipulator, new_data, errors)
+    return render_to_response('apparatus/createsidebarform.html', {'membership': membership, 'form':
+            form}, RequestContext(request))
+    
+
+def editsidebar(request, sidebar):
+    rg = request.GET.get
+    sender = rg("from","")
+    try: s = Sidebar.objects.get(id=sidebar)
+    except Sidebar.DoesNotExist: return error(request, "Sidebar does not exist")
+    
+    u = request.user
+    if u.is_superuser or s.is_editor(u):
+        manipulator = Sidebar.ChangeManipulator(s.id)
+        if request.POST:
+            new_data = request.POST.copy()
+            errors = manipulator.get_validation_errors(new_data)
+            new_data["group"] = ''
+            if not errors:
+                manipulator.do_html2python(new_data)
+                manipulator.save(new_data)
+                return HttpResponseRedirect(sender)
+        else:
+            errors = {}
+            new_data = s.__dict__
+        
+        form = forms.FormWrapper(manipulator, new_data, errors)
+        return render_to_response('apparatus/sidebareditform.html', {'form':
+                form, 'sidebar': s}, RequestContext(request))
+        
+    else:
+        return error(request, "You do not have the appropriate permissions \
+                to edit this sidebar")
+

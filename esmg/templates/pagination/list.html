@@ -1,0 +1,45 @@
+{% if is_paginated %}
+<ul class="paginav">
+    {% if has_previous %}
+      <li>
+        {% ifequal previous 1 %}
+          <a class="nextprev" href="{{ pagecontrols_base }}?{% if query %}{{ query }}{% endif %}">&larr; Previous</a>
+        {% else %}
+          <a class="nextprev" href="{{ pagecontrols_base }}?{% if query %}{{ query }}&amp;{% endif %}page={{ previous }}">&larr; Previous</a>
+        {% endifequal %}
+      </li>
+    {% endif %}
+    
+    {% if localpages %}
+      {% if localpages.has_earlier_pages %}
+        <li>
+          <a href="{{ pagecontrols_base }}?{% if query %}{{ query }}&amp;{% endif %}page=1">1</a>
+        </li>
+        <li class="ellipsis">...</li>
+      {% endif %}
+      {% for lpage in localpages %}
+        {% ifequal lpage page %}
+          <li class="current">
+            {{ lpage }}
+          </li>
+        {% else %}
+          <li>
+            <a href="{{ pagecontrols_base }}?{% if query %}{{ query }}&amp;{% endif %}page={{ lpage }}">{{ lpage }}</a>
+          </li>
+        {% endifequal %}
+      {% endfor %}
+      {% if localpages.has_more_pages %}
+        <li class="ellipsis">...</li>
+        <li>
+          <a href="{{ pagecontrols_base }}?{% if query %}{{ query }}&amp;{% endif %}page={{ pages }}">{{ pages }}</a>
+        </li>
+      {% endif %}
+    {% endif %}
+    
+    {% if has_next %}
+      <li>
+        <a class="nextprev" href="{{ pagecontrols_base }}?{% if query %}{{ query }}&amp;{% endif %}page={{ next }}">Next &rarr;</a>
+      </li>
+    {% endif %}
+  </ul>
+{% endif %}

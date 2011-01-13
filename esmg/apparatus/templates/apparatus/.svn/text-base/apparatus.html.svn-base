@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}{{ pagecontent.title }}{% endblock %}
+{% block keywords%}{{keywords}}{% endblock %}
+{% block description %}{{description}}{% endblock %}
+
+
+{% block content %}
+   {% include "apparatus/content_block.html" %}
+{% endblock %}
+

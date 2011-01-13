@@ -1,0 +1,50 @@
+{% extends "base_list.html" %}
+
+{% load publications %}
+{% load home %}
+{% load markup %}
+
+{% block title %}
+  {% firstof person group  %}: {{type}}
+{% endblock %}
+
+{% block heading %}{% if person and group %}{{person.first_name}}'s blog {% else %}{{type}}{% endif %}{% endblock %}
+
+
+{% block object %}
+  <div class="result">
+      <ul>
+        <li class="object_heading"><a href="{{object.id}}">{{object}}</a></li>
+        <li class="object_detail">{{object.body|textile|truncatewords:"25"}} <a href="{{object.id}}">more</a></li>
+        <li class="object_notes">Comments: {{ object.comment_set.count }}</li>
+      </ul>
+    </li>
+  </div>
+{% endblock %}
+
+{% block sidebar %}
+<div id="sidebar" class="narrow">
+  {% if persontest %}
+  <div id="actions" class="sidebar-block">
+    <h2>Actions</h2>
+  <ul>
+    <li><a href="post/">Add blog post</a></li>
+  </ul>
+  </div>
+  {% else %}
+    {% if grouptest %}
+    <div id="actions" class="sidebar-block">
+    <h2>Actions</h2>
+    <ul>
+        {% ifequal type "Events" %}
+          <li><a href="add/">Add event</a></li>
+        {% else %}
+          <li><a href="add/">Add news item</a></li>
+        {% endifequal %}
+      </ul>
+    </div>
+    {% endif %}
+  {% endif %}
+  {% include "pagenav-snippet.html" %}
+</div>
+  {%endblock%}

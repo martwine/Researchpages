@@ -1,0 +1,134 @@
+{% extends "base_list.html" %}
+
+{% load plist_extras %}
+{% load publications %}
+{% load home %}
+
+{% block title %}People{% endblock %}
+{% block heading %}People{% endblock %}
+{% block error_type %}people{% endblock %}
+{% block error_type_search %}people{% endblock %}
+{% block list_type %}people{% endblock %}
+
+{% block preamble %}
+{% if not group %}
+  <div id="search">
+    <form action="{{ urlbase }}/people/search/" method="get">
+      Search people:
+      <input type="text" name="q" value="" size="30">
+      <input type="submit" name="submit" value="Search">
+    </form>
+  </div>
+{% endif %}
+{% endblock %}
+
+
+{% block object %}
+  {% if group %}
+  {% if not user.is_anonymous %}
+  <div class="plist_actions">
+    <h2>Actions</h2>
+    {% ifequal user.person.slug object.slug %}
+      <p><a href="{{group.get_absolute_url}}/people/{{ object.slug }}/details/edit/">Edit my details</a></p>
+      <p><a href="{{group.get_absolute_url}}/people/{{ object.slug }}/role/">Add/edit my role in {{group}}</a></p>
+    {% else %}
+      {% if object|isnt_friend:user %}
+        <p><a href="{{urlbase}}/friend_request/{{object.slug}}">Add {{object}} to my friends</a></p>
+      {% endif%}
+      {% if group|is_manager:user.person %}
+        <p><a href="{{group.get_absolute_url}}/people/{{ object.slug }}/details/edit/">Edit {{object}}'s details</a></p>
+        <p><a href="{{group.get_absolute_url}}/people/{{ object.slug }}/role/">Add/edit {{object}}'s role in {{group}}</a></p>
+      {% endif %}
+    {% endifequal %}
+  </div>
+  {% endif %}
+  <div class="personresult">
+    <div class="plist_photo">
+        <a alt="{{ object.slug }}" href="{{group.get_absolute_url}}/people/{{ object.slug }}">{{object.get_thumbnail_html}}</a>
+    </div>
+      <h2><a name="{{ object.slug }}" alt="{{ object.slug }}" href="{{group.get_absolute_url}}/people/{{ object.slug }}">{{ object.name }}</a></h2>
+      {% if object.institution %}<h3>{{ object.institution }}</h3>{% endif %}
+      {{ object|get_roles:group }}
+    </div>
+  {% else %}
+  {% if not user.is_anonymous %}
+  <div class="plist_actions">
+    <h2>Actions</h2>
+    {% ifequal user.person.slug object.slug %}
+      <p><a href="{{group.get_absolute_url}}/people/{{ object.slug }}/details/edit/">Edit my details</a></p>
+      <p><a href="{{group.get_absolute_url}}/people/{{ object.slug }}/role/">Add/edit my role in {{group}}</a></p>
+    {% else %}
+      {% if object|isnt_friend:user %}
+        <p><a href="{{urlbase}}/friend_request/{{object.slug}}">Add {{object}} to my friends</a></p>
+      {% else %}
+        <p>no actions</p>  
+      {% endif%}
+    {% endifequal %}
+  </div>
+  {% endif %}
+  <div class="personresult">
+    <div class="plist_photo">
+        <a alt="{{ object.slug }}" href="{{group.get_absolute_url}}/people/{{ object.slug }}">{{object.get_thumbnail_html}}</a>
+    </div>
+      <h2><a name="{{ object.slug }}" alt="{{ object.slug }}" href="{{group.get_absolute_url}}/people/{{ object.slug }}">{{ object.name }}</a></h2>
+      {% if object.institution %}<h3>{{ object.institution }}</h3>{% endif %}
+      {% if object.groups %}
+      <p>Groups:
+      {% for pgroup in object.groups %}
+      <a href="{{ pgroup.get_absolute_url }}">{{ pgroup }}</a> &nbsp;
+      {% endfor %}</p>
+      {% endif %}
+  </div>
+  {% endif %}
+{% endblock %}
+
+{% block sidebar %}
+  <div id="sidebar" class="narrow">
+  {% if user.is_staff %}
+  <div id="actions" class="sidebar-block">
+    <h2>Actions</h2>
+    <ul>
+      <li><a href="{{ urlbase }}/admin/people/person/">Edit people</a></li>
+      <li><a href="{{ urlbase }}/admin/people/person/add/">Add a new 
+      person</a></li>
+      <li><a href="{{ urlbase }}/people/csv/">Export people in CSV format</a></li>
+    </ul>
+  </div>
+  {% endif %}
+    {% if group %}
+      <div class="sidebar-block">
+        <h2>Quick Links</h2>
+        <ul>
+          {% for object in object_list %}
+            <li><a href="{{urlbase}}/{{group.acronym}}/people/{{object.slug}}">{{object.name}}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% else %}
+      {% if latest_people %}
+        <div class="sidebar-block">
+          <h2>Latest people to join</h2>
+          <ul>
+            {% if group %}
+              {% for c in latest_people %}
+                <li><a href="{{ urlbase }}/{{group.acronym}}/people/{{c.slug}}">{{ c }}</a></li>
+              {% endfor %}
+            {% else %}
+              {% for c in latest_people %}
+                <li><a href="{{ c.get_absolute_url }}">{{ c }}</a></li>
+              {% endfor %}
+            {% endif %}
+          </ul>
+        </div>
+      {% endif %}
+    {% endif %}
+    {% include 'pagenav-snippet.html' %}
+ </div>
+{% endblock %}
+
+{% block footer %}
+  <div id="footer">
+    &nbsp;
+  </div>
+{% endblock %}
+

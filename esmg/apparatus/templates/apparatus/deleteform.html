@@ -1,0 +1,17 @@
+{% extends "base_message.html" %}
+
+{% block title %}Delete &ldquo;{{ page.pcontent.latest.title }}&rdquo;{% endblock %}
+
+{% block content %}
+
+<div id="message">
+  <h1>Delete &ldquo;{{ page.pcontent.latest.title }}&rdquo;</h1>
+    <p class="message-hint">This will delete the page from the site, but not
+      from the database. All child pages will also be deleted. If you do not
+      wish child pages to be deleted, you should move them first. If you wish to
+      reinstate the page(s) in the future, please contact the webmaster.</p>
+    <form action="" method="post">
+      <input type="submit" name="submit" value="Confirm delete">
+    </form>
+  </div>
+{% endblock %}  

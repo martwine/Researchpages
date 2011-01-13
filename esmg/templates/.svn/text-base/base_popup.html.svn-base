@@ -1,0 +1,24 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+{% load apparatus vars %}
+{% pushvars esmg.apparatus.views.basetemplatelinks %}
+
+<html lang="en">
+  <head>
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{{urlbase}}/media/styles.css">
+    {% if css %}
+      <link rel="stylesheet" type="text/css" href="{{css}}">
+    {% endif %}
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="robots" content="noindex">
+  </head>
+
+  <body>
+    <div id="popup-page">
+
+      {% block content %}{% endblock %}
+    </div>
+  </body>
+</html>
+
+

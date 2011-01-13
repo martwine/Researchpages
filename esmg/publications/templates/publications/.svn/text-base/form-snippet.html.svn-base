@@ -1,0 +1,5 @@
+<p>{{form.author.errors}}<label for={{form.author.auto_id}}" class="required">{{form.author.label}}</label>{{form.author}}</p> 
+<p>{{form.first_name.errors}}<label for="{{form.first_name.auto_id}}">{{form.first_name.label}}</label>{{form.first_name}}</p>
+<p>{{form.last_name.errors}}<label for="{{form.last_name.auto_id}}">{{form.last_name.label}}</label>{{form.last_name}}</p>
+<p>{{form.email.errors}}<label for="{{form.email.auto_id}}">{{form.email.label}}</label>{{form.email}}</p>
+

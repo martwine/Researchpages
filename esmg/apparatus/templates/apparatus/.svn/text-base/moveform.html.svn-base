@@ -1,0 +1,23 @@
+{% extends "base_message.html" %}
+
+{% block title %}Move &ldquo;{{ page.pcontent.latest.title }}&rdquo;{% endblock %}
+
+{% block content %}
+
+<div id="message">
+  <h1>Move &ldquo;{{ page.pcontent.latest.title }}&rdquo;</h1>
+    <p class="message-hint">This will move
+      &ldquo;{{ page.pcontent.latest.title }}&rdquo; and all of its child pages 
+      from {{ page }} to below the selected parent page. The tree structure of 
+      the page to be moved and its child pages will be maintained.</p>
+    <form action="" method="post"> 
+      <div class="form-line">
+        <label for="{{ form.parent_id.get_id }}">New parent page</label> 
+        {{ form.parent_id }}
+      </div>
+      <div class="form-submit">
+        <input type="submit" name="submit" value="Move">
+      </div>
+    </form>
+  </div>
+{% endblock %}  

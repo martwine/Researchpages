@@ -1,0 +1,28 @@
+Welcome to ResearchPages!
+
+Your information has been added to the ResearchPages web site ({{urlbase}}). This has happened because either a) You have requested a ResearchPages page or b) a group or project you are involved with is setting up a site on ResearchPages.</p>
+
+You can log in with the following details:
+
+Username: {{ person.user.username }}
+Password: {{ person.password }}
+
+To log in now, go to {{ urlbase }}/accounts/login/.
+
+A personal 'home' page has been created for you at: {{ person.get_absolute_url }}
+
+If you are a member of a research group or project whose pages are on the 
+site, you will also be able to access and edit your personal through the 
+group's pages e.g. http://researchpages.net/QQ/
+
+ResearchPages can be used to keep track of people and publications, to share files and very soon, to share news and organise events. You can also create your own pages on the site. For more information, 
+visit {{ urlbase }}/help/welcome/ for more info.
+
+Please let me know if you have any questions or suggestions.</p>
+
+Your sincerely
+
+Martin Johnson
+
+email:martin.johnson@uea.ac.uk
+

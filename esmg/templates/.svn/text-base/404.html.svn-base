@@ -1,0 +1,24 @@
+{% extends "base_message.html" %}
+
+{% block title %}Page not found{% endblock %}
+
+{% block content %}
+<div id="message">
+  <h1>Page not found</h1>
+    <p class="message-error">The page you requested does not exist.</p>
+    <p>To find what you are looking for, try starting from the <a href="{{urlbase}}">front page</a></p>
+  </div>
+{% endblock %}
+
+
+  {% if editor %}
+  <div id="sidebar" class="narrow">
+    <div id="actions" class="sidebar-block">
+      <h2>Actions</h2>
+    <ul>
+      <li><a href="{{ parent_url }}create/">Create a new page here</a></li>
+    </ul>
+  </div>
+  </div>
+  {% endif %}
+

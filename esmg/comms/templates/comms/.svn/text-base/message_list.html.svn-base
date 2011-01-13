@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% load publications %}
+
+{% block title %}
+{{person}}: Messages
+{% endblock %}
+
+
+{% block content %}
+<div id="main">
+  <h1>Messages</h1>
+{% if not messagecount %}
+<h2> No messages </h2>
+{% endif%}
+{% for message in unread %}
+  <div class="result">
+      <ul>
+        <li class="object_heading"><strong><a href="{{message.id}}">{{message.title}}</a></strong></li>
+        <li class="object_notes">from: {{message.from_name}}</li>
+        <li class="object_detail">{{message.body|truncatewords:"50"|escape|linebreaksbr}}... <a href="{{message.id}}">more</a></li>
+        <li class="object_notes">{{message.timestamp|date:"d/m/y"}}{{message.timestamp|date:"G:i"}}</li>
+      </ul>
+    </li>
+  </div>
+{% endfor %}
+{% for message in read %}
+  <div class="result">
+      <ul>
+        <li class="object_heading"><a href="{{message.id}}">{{message.title}}</a></li>
+        <li class="object_notes">from: {{message.from_name}}</li>
+        <li class="object_detail">{{message.body|truncatewords:"50"}}... <a href="{{message.id}}">more</a></li>
+        <li class="object_notes">{{message.timestamp|date:"d/m/y"}}{{message.timestamp|date:"G:i"}}</li>
+      </ul>
+    </li>
+  </div>
+{% endfor %}
+</div>
+
+<div id="sidebar" class="narrow">
+  <div id="actions" class="sidebar-block">
+    <h2>Actions</h2>
+  <ul>
+    <li><a href="send/">Send new message</a></li>
+  </ul>
+  </div>
+  {% include 'pagenav-snippet.html' %}
+  {% include 'groupnav-snippet.html' %}
+</div>
+  {%endblock%}

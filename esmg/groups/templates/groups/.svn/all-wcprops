@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/repos/apparatus/!svn/ver/573/groups/templates/groups
+END
+group_form.html
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/repos/apparatus/!svn/ver/483/groups/templates/groups/group_form.html
+END
+role_form.html
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/repos/apparatus/!svn/ver/573/groups/templates/groups/role_form.html
+END
+group_list.html
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/repos/apparatus/!svn/ver/563/groups/templates/groups/group_list.html
+END

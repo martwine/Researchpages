@@ -1,0 +1,66 @@
+{% load markup %}
+{% load home %}
+
+
+<div id="main">
+  <h1>{{ pagecontent.title }}</h1>
+  {{ pagecontent.body|textile }}
+</div>
+
+<div id="sidebar">
+  {% if editor %}
+    <div id="actions" class="sidebar-block">
+      <h2>Actions</h2>
+      <ul>
+        <h3>Page actions</h3>
+        <li>{{ editlink }}</li>
+        <li>{{ createlink }}</li>
+        <li>{{ movelink }}</li>
+        <li>{{ deletelink }}</li>
+        <li><a href="{{ urlbase }}{{ page.uri }}sidebaradd/">Add a sidebar</a></li>
+        {% if group|is_member:user.person %}
+        <h3>Group actions</h3>
+        <li><a href="{{group.get_absolute_url}}/news/add/">Add a news item</a></li>
+        <li><a href="{{group.get_absolute_url}}/events/add/">Add an event</a></li>
+        {% if not group.has_wiki %}
+        <li><a href="{{group.get_absolute_url}}/wiki/">Start a {{group}} wiki</a></li>
+        {% endif %}
+        {% if group|is_manager:user.person %}<li><a href="{{group.get_absolute_url}}/manage/">Manage {{group}}</a></li>{% endif %}
+        {% endif %}
+      </ul>
+  </div>
+  {% endif %}
+  {% include "pagenav-snippet.html" %}
+  {% for sbjoin in page.sidebarjoin_set.all %}
+    <div class="sidebar-block">
+      <h2>{{ sbjoin.sidebar.name }}</h2>
+
+      {{ sbjoin.sidebar.body|textile }}
+
+      {% if editor %}
+          <ul class="sidebar-actions">
+            {% if user.is_staff or user.is_superuser %}
+              <li><a href="{{ sbjoin.sidebar.get_edit_url }}?from={% if person %}{% if group %}{{ group.get_absolute_url }}{{ page.uri }}{% else %}{{ person.get_absolute_url }}{% endif %}{% else %}{{ page.get_absolute_url }}{% endif %}">Edit</a></li>
+            {% else %}
+            {% ifequal user.id sbjoin.sidebar.creator_id %}
+                <li><a href="{{ sbjoin.sidebar.get_edit_url }}?from={% if person %}{% if group %}{{ group.get_absolute_url }}{{ page.uri }}{% endif %}{% else %}{{ page.get_absolute_url }}{% endif %}">Edit</a></li>
+              {% endifequal %}
+            {% endif %}
+            <li><a href="{{ page.get_absolute_url }}sidebarremove/{{ sbjoin.sidebar.id }}/">Remove</a></li>
+          </ul>
+      {% endif %}
+    </div>
+  {% endfor %}
+</div>
+
+<div id="footer">
+  Last updated at {{ pagecontent.time|date:"G:i" }} on
+  {{ pagecontent.time|date:"d/m/Y" }} by
+  {% if group %}
+  <a href="{{group.get_absolute_url}}/people/{{pagecontent.last_editor.slug}}/">{{ pagecontent.last_editor }}</a>.
+  {% else %}
+  <a href="{{ pagecontent.last_editor.get_absolute_url }}">{{ pagecontent.last_editor }}</a>.
+  {% endif %}
+</div>
+
+

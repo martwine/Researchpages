@@ -1,0 +1,20 @@
+{% extends "base_message.html" %}
+
+{% block title %}Post{% endblock %}
+
+{% block content %}
+<div id="message">
+  {% if edit %}
+    <h1>Edit post</h1>
+  {% else %}
+    <h1>Add {{type}} post</h1>  
+  {% endif %}
+
+  <form action="" method="post" enctype="multipart/form-data">
+    {{form.as_p}}
+    <p class="submit"><input type="submit" value="Save"/></p>
+  </form>
+</div>
+{% endblock %}
+
+

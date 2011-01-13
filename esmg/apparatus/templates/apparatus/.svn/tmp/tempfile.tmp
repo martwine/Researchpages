@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}{{ pagecontent.title }}{% endblock %}
+
+{% block keywords %}{% firstof keywords group.keywords%}{% endblock %}
+{% block description %}{% firstof description group.description%}{% endblock %}
+
+{% block content %}
+   {% include "apparatus/content_block.html" %}
+{% endblock %}
+
+<<<<<<< .mine
+=======
+{% block actions %}
+{% if user.is_staff or editor %}
+      <div class="sidebar-block" id="actions">
+        <h2>Actions</h2>
+        <ul>
+      {% if editor %}
+              <li>{{ editlink }}</li>
+              <li>{{ createlink }}</li>
+              {% if groupnotpersonpage %}
+                <li><a href="{{ urlbase }}{{ page.uri }}sidebaradd/">Add a 
+                  sidebar</a></li>
+       {% else %}
+          {% if group %}
+            <li><a href="{{ group.get_absolute_url }}{{ page.uri }}sidebaradd/">Add a 
+            sidebar</a></li>
+          {% else %}
+          <li><a href="{{ urlbase }}{{ page.uri }}sidebaradd/">Add a 
+            sidebar</a></li>
+          {% endif %}
+        {% endif %}
+        {% endif %}
+        {% endif %}
+{% endblock %}
+>>>>>>> .r500

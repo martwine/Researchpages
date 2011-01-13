@@ -1,0 +1,12 @@
+{{type}} from {{from}}{% ifnotequal type "Friend request" %}:
+{{title}}{% endifnotequal %}
+
+{{body}}
+
+ {% ifequal type "Friend request" %}
+To confirm this request, please go to {{url}}
+ {% else %}
+To view this {{type}} online, reply or add a comment, go to {{url}}
+{% endifequal %}
+
+Researchpages: Your page: {{recipient.get_absolute_url}} | Edit your details: {{recipient.get_edit_url}}

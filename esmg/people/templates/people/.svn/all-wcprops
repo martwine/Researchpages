@@ -1,0 +1,71 @@
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/repos/apparatus/!svn/ver/577/people/templates/people
+END
+person_welcome_mail.txt
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/repos/apparatus/!svn/ver/471/people/templates/people/person_welcome_mail.txt
+END
+friend_request.html
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/repos/apparatus/!svn/ver/487/people/templates/people/friend_request.html
+END
+person_list.html
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/repos/apparatus/!svn/ver/572/people/templates/people/person_list.html
+END
+personpage.html
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/repos/apparatus/!svn/ver/481/people/templates/people/personpage.html
+END
+person_welcome_mail.html
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/repos/apparatus/!svn/ver/471/people/templates/people/person_welcome_mail.html
+END
+password_reminder_mail.txt
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/repos/apparatus/!svn/ver/426/people/templates/people/password_reminder_mail.txt
+END
+friend_confirms.html
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/repos/apparatus/!svn/ver/487/people/templates/people/friend_confirms.html
+END
+person_detail.html
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/repos/apparatus/!svn/ver/613/people/templates/people/person_detail.html
+END
+home.html
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/repos/apparatus/!svn/ver/548/people/templates/people/home.html
+END
+person_form.html
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/repos/apparatus/!svn/ver/606/people/templates/people/person_form.html
+END
+password_reminder_mail.html
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/repos/apparatus/!svn/ver/422/people/templates/people/password_reminder_mail.html
+END

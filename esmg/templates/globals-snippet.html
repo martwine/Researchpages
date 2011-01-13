@@ -1,0 +1,38 @@
+      <div id="global">
+        <a href="{{urlbase}}/{% if not user.is_anonymous %}home/{% endif %}"><img src="{{urlbase}}/media/rplogolarge.gif" width="38" height="38" alt="38"></a>
+        <div id="login">
+          <div id="login_left">
+     		    {% if user.is_anonymous %}
+            <a href="{{ urlbase }}/accounts/login/{% ifequal request_path '/accounts/logout/' %}?next=/esmg/{% else %}?next={{ request_path }}{% endifequal %}">Log in</a> | <a href="{{urlbase}}/help/request_login">sign up</a>
+      	    {% else %}
+              Logged in as {{ user }}
+            {% endif %}
+          </div> 
+          <div id="login_right">
+            ResearchPages: <a href="{{urlbase}}">home</a> | 
+            <a href="{{urlbase}}/people/">people</a> |  
+            <a href="{{urlbase}}/groups/">groups</a> |  
+            <a href="{{urlbase}}/features/">features</a> |  
+            <a href="{{urlbase}}/help/">help</a> |  
+            <a href="{{urlbase}}/help/faq/">faq</a> |  
+            <a href="{{urlbase}}/contact/">contact us</a> 
+            {% if user.is_superuser or user.is_staff %}
+             | <a class="action" href="{{ urlbase }}/admin/">Site admin</a>
+            {% endif %}
+          </div>
+        </div>
+        {% if user.is_anonymous %}
+        <div id="globalnav_centre"><h1><em>ResearchPages: Social networking and web content creation tools for the research community</em></h1></div>
+        {% else %}
+          <ul id="globalnav_left">
+              <li><a href="{{ urlbase }}/home/">Home</a></li>
+              <li><a href="{{ user.person.get_absolute_url }}">My Page</a></li>
+              <li><a href="{{ urlbase }}/messages/">Messages{% if user.person.unreadmessages %}({{user.person.unreadmessages}}){% endif %}</a></li>
+          </ul>
+          <ul id="globalnav_right">
+            <li><a href="{{ user.person.get_edit_url }}">Account</a></li>
+            <li><a href="{{ user.person.get_edit_password_url }}">Change your password</a></li>
+            <li><a href="{{ urlbase }}/accounts/logout/">Log out</a></li>
+          </ul>
+        {% endif%}
+      </div>

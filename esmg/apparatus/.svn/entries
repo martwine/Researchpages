@@ -1,0 +1,73 @@
+8
+
+dir
+587
+http://svn.researchpages.co.uk/repos/apparatus/apparatus
+http://svn.researchpages.co.uk/repos/apparatus
+
+
+
+2007-10-12T00:54:36.780745Z
+579
+martin
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+abf93926-5328-0410-a704-dd263852005c
+
+views.py
+file
+610
+
+
+
+2008-04-22T11:33:38.000000Z
+141f167c03e47230689beecff06ff751
+2008-04-22T11:37:14.407955Z
+610
+martin
+has-props
+
+__init__.py
+file
+
+
+
+
+2007-04-08T09:29:28.000000Z
+d41d8cd98f00b204e9800998ecf8427e
+2007-01-31T10:03:21.676339Z
+1
+martin
+has-props
+
+templatetags
+dir
+
+models.py
+file
+
+
+
+
+2007-10-15T08:43:17.000000Z
+d61a2a345a7979b4b10ab1541e6e0633
+2007-10-09T11:12:47.146264Z
+569
+martin
+has-props
+
+templates
+dir
+

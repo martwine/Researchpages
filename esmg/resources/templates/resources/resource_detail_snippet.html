@@ -1,0 +1,19 @@
+<h2>{{ object }}</h2>
+
+{% ifequal object.type "epic" %}
+  <img src="{{ object.get_file_url }}" width="{{ image_width }}"
+  height="{{ image_height }}" alt="{{ object.description }}" >
+{% endifequal %}
+
+<p class="message-info">{{ object.description }}</p>
+
+{% ifequal object.type "epic" %}
+  <p>To include this picture in a page, use this code:</p>
+  <textarea class="textile-snippet">!{{ object.get_file_url }}({{ object.description }})!</textarea>
+{% else %}
+  <p>To link to this file from a page, use this code:</p>
+  <textarea class="textile-snippet">"link text":{{ object.get_file_url }}</textarea>
+{% endifequal %}
+
+<p>The address for this {% ifequal object.type "epic" %}picture{% else %}file{% endifequal %} is:</p>
+<p><a href="{{ object.get_file_url }}">{{ object.get_file_url }}</a></p>

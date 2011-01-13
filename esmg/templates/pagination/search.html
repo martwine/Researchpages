@@ -1,0 +1,35 @@
+{% if is_paginated %}
+  <div class="blog-nav-footer">
+    {% if has_previous %}
+      <div class="blog-nav-previous">
+        {% ifequal previous 0 %}
+          &larr; <a href="{{ urlbase }}/blog/search/?{% if query %}q={{ query }}&amp;{% endif %}page={{ previous }}">Previous</a>
+        {% else %}
+          &larr; <a href="{{ urlbase }}/blog/search/{% if query %}?q={{ query }}{% endif %}">Previous</a>
+        {% endifequal %}
+      </div>
+    {% endif %}
+    {% if has_next %}
+      <div class="blog-nav-next">
+        <a href="{{ urlbase }}/blog/search/?{% if query %}q={{ query }}&amp;{% endif %}page={{ next }}">Next</a> &rarr;
+      </div>
+    {% endif %}
+
+    {% if paginator %}
+      Page:
+      {% if paginator.localpages.firstpage %}
+        <a href="{{ urlbase }}/blog/search/?{% if query %}q={{ query }}&amp;{% endif %}page=0">first</a>,
+      {% endif %}
+      {% for page in paginator.localpages %}
+        {% ifequal page paginator.current %}
+          {{ page|add:"1" }}{% if forloop.last %}{% if paginator.localpages.lastpage %},{% endif %}{% else %},{% endif %}
+        {% else %}
+          <a href="{{ urlbase }}/blog/search/?{% if query %}q={{ query }}&amp;{% endif %}page={{ page }}">{{ page|add:"1" }}</a>{% if forloop.last %}{% if paginator.localpages.lastpage %},{% endif %}{% else %},{% endif %}
+        {% endifequal %}
+      {% endfor %}
+      {% if paginator.localpages.lastpage %}
+        <a href="{{ urlbase }}/blog/search/?{% if query %}q={{ query }}&amp;{% endif %}page={{ paginator.pages|add:"-1" }}">last</a>
+      {% endif %}
+    {% endif %}
+  </div>
+{% endif %}

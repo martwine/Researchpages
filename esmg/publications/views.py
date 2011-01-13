@@ -1,0 +1,348 @@
+from urllib import urlencode
+from django.db.models import Q
+from afternoon.views.generic.list_detail import object_list, object_detail
+from afternoon.django.errors.views import error
+from django.views.generic.create_update import update_object
+import operator
+import dynamicforms
+from django.db.models.query import QuerySet
+from django.shortcuts import render_to_response, get_object_or_404
+from django.conf import settings
+from django import newforms as forms
+from django.newforms import form_for_model, widgets, form_for_instance
+from django.template import RequestContext
+from django.http import Http404, HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
+
+from esmg.publications.models import Publication, Author, Groupship, Authorship
+from esmg.groups.models import Group
+
+
+class AuthorshipForm(dynamicforms.Form):
+    CORE = ('author',)
+    TEMPLATE = 'publications/form-snippet.html'
+    author = forms.ChoiceField(choices=[('no','----------')] + [(a.email,unicode(a)) for a in Author.objects.filter(person__isnull=False)])
+    first_name = forms.CharField(required=False)
+    last_name  = forms.CharField(required=False)
+    email = forms.CharField(required=False)
+
+class GroupshipForm(forms.Form):
+    def __init__(self, post,  ms=None):
+        super(GroupshipForm, self).__init__(post)
+        query = Group.objects.filter(membership__in=ms) if ms else Group.objects.all()
+        choices=[('none','----------')] + [(g.id,unicode(g)) for g in query]
+        self.fields['group_1'].choices=choices
+        self.fields['group_2'].choices=choices
+        self.fields['group_3'].choices=choices
+    group_1 = forms.ChoiceField(choices=(), widget=forms.Select(), required=False)
+    group_2 = forms.ChoiceField(choices=(), widget=forms.Select(), required=False)
+    group_3 = forms.ChoiceField(choices=(), widget=forms.Select(), required=False)
+    #group_1 = forms.ChoiceField(choices=[('none','----------')] +
+    #            [(g.id,unicode(g)) for g in Group.objects.all()], widget=forms.Select(), required=False)
+    #group_2 = forms.ChoiceField(choices=[('none','----------')] +
+    #            [(g.id,unicode(g)) for g in Group.objects.all()], widget=forms.Select(), required=False)
+    #group_3 = forms.ChoiceField(choices=[('none','----------')] +
+    #            [(g.id,unicode(g)) for g in Group.objects.all()], widget=forms.Select(), required=False)
+    
+
+#@login_required
+#def delete_publication(request, **kwargs):
+#    from esmg.people.models import Person
+#    membership=False
+#    group = kwargs.get("group", False)
+#    if group:
+#       g = Group.objects.get(acronym=group)
+       
+
+@login_required
+def edit_publication(request, **kwargs):
+    from esmg.people.models import Person
+    membership = False
+    group = kwargs.get("group", False)
+    if group:
+        g = Group.objects.get(acronym=group)
+    person = request.user.person
+    ms = person.membership_set.all()
+    pubinstance = kwargs.get("object_id", False)
+    PublicationForm = form_for_model(Publication)
+    if pubinstance:
+        try:
+            pub = Publication.objects.get(id=pubinstance)
+        except:
+            return error(request,u"Publication not found")
+        PubInstanceForm = form_for_instance(pub)
+        gss = Groupship.objects.filter(publication=pub) 
+        if gss.count() > 0:
+            currentgroupships = gss
+        else: 
+            currentgroupships = False
+        add = False
+    else:
+        add = True
+        currentgroupships = False
+    if request.method == 'POST':
+        uselessvar = kwargs.pop('ms', False)
+        if pubinstance:
+            pubform = PubInstanceForm(request.POST, request.FILES)
+        else:
+            pubform = PublicationForm(request.POST, request.FILES)
+        groupform = GroupshipForm(request.POST) 
+        authorship_forms = AuthorshipForm.get_forms(request)
+        authorship_data = [authorship_form.render_js('from_template') for authorship_form in authorship_forms]
+        if authorship_forms.are_valid() and groupform.is_valid() and pubform.is_valid():
+        #if authorship_forms.are_valid() and pubform.is_valid():
+            publication = pubform.save()
+            if not groupform.cleaned_data['group_1'] == 'none':
+                grp = Group.objects.get(id=groupform.cleaned_data['group_1'])
+                gs = Groupship(group=grp,publication=publication)
+                gs.save()
+            if not groupform.cleaned_data['group_2'] == 'none':
+                grp = Group.objects.get(id=groupform.cleaned_data['group_2'])
+                gs = Groupship(group=grp,publication=publication)
+                gs.save()
+            if not groupform.cleaned_data['group_3'] == 'none':
+                grp = Group.objects.get(id=groupform.cleaned_data['group_3'])
+                gs = Groupship(group=grp,publication=publication)
+                gs.save()
+            
+            for auth in Authorship.objects.filter(publication=publication):
+                auth.delete()
+            #out=[('keys',request.POST.keys())]
+            for form in authorship_forms:
+                #out.append(('form',form.postfix,form.id,form.cleaned_data['author'],form.cleaned_data['last_name']))
+                if not form.cleaned_data['author'] == 'no':
+                    email = form.cleaned_data['author']
+                    try:
+                        p = Person.objects.get(email=email)
+                    except:
+                        return error(request,u'Something has gone wrong with \
+                                the email addresses stored for authors the \
+                                ResearcPages database. Please go back and try \
+                                again. If this doesn\'t work please contact \
+                                admin@researchpages.net')
+                    a = Author.objects.get(person=p)
+                    as = Authorship(author=a,publication=publication)
+                    as.save()
+                elif not form.cleaned_data['last_name'] == '':
+                    if (not form.cleaned_data['email'] == '') and Person.objects.filter(email=form.cleaned_data['email']).count() >0:
+                        a = Author.objects.get(person=Person.objects.get(email=form.cleaned_data['email']))
+                    else:
+                        a, created = Author.objects.get_or_create(first_name=form.cleaned_data['first_name'],
+                            last_name=form.cleaned_data['last_name'],
+                            email=form.cleaned_data['email'])
+                    as = Authorship(author=a,publication=publication)
+                    as.save()
+                else: 
+                    pass
+            if pubinstance:
+                return HttpResponseRedirect('../../' + str(publication.id))
+            else:
+                return HttpResponseRedirect('../' + str(publication.id))
+    else:
+        if pubinstance:
+            pubform = PubInstanceForm()
+            authorship_data = [AuthorshipForm(initial={'author':
+                    authorship.author.get_form_author(),'first_name':authorship.author.first_name,'last_name':authorship.author.last_name,'email':authorship.author.email},
+                    id=authorship.id).render_js('from_template') for authorship in
+                    Authorship.objects.filter(publication=pub)]    
+        else:
+            pubform = PublicationForm()
+            authorship_data = [AuthorshipForm(initial={'author': 'no'}).render_js('from_template')]
+        groupform = GroupshipForm(request.POST, ms)
+    if group:
+    	css = g.defaultcss
+    	logo = g.get_logo_url()
+    else:
+    	css = settings.DEFAULT_CSS
+    	logo = settings.DEFAULT_LOGO
+    return render_to_response('publications/publication_form.html', 
+            {
+            'pubform': pubform, 
+            'groupform': groupform,
+            'add': add,
+            'currentgroupships': currentgroupships,
+            'css':css, 'logo':logo, 'membership':membership, 
+            'authorship_data': authorship_data, 
+            'authorship_template':AuthorshipForm(initial={'author':
+                'no'}).render_js('from_template')},
+            RequestContext(request))
+
+
+    
+@login_required
+def old_edit_publication(request, **kwargs):
+    group = kwargs.get("group", False)
+    if group:
+        g = Group.objects.get(acronym=group)
+    id = kwargs.get("object_id", False)
+    if request.user.is_anonymous():
+        return HttpResponseRedirect(settings.URLBASE +'/accounts/login/')
+#    try:
+#        manipulator = Publication.ChangeManipulator(id)
+#    except Publication.DoesNotExist:
+#        raise Http404
+    person = request.user.person
+    membership = person.membership_set.all()
+#    publication = manipulator.original_object
+#    if request.POST:
+#        new_data = request.POST.copy()
+#        errors = manipulator.get_validation_errors(new_data)
+#        manipulator.do_html2python(new_data)
+#        if not errors:
+#            manipulator.save(new_data)
+#            if group:
+#                return HttpResponseRedirect (g.get_absolute_url() +
+#                '/publications/')
+#            else: 
+#                return HttpResponseRedirect(settings.URLBASE + '/publications/' )
+#    else:
+#        errors = {}
+#        new_data=manipulator.flatten_data()
+#    form = forms.FormWrapper(manipulator, new_data, errors)
+    if group:
+    	css = g.defaultcss
+    	logo = g.get_logo_url()
+        del kwargs['group']
+        redirect = g.get_absolute_url() + '/publications/'
+    else:
+    	css = settings.DEFAULT_CSS
+    	logo = settings.DEFAULT_LOGO
+        redirect = settings.URLBASE + '/publications'
+    kwargs['model'] = Publication
+    kwargs['extra_context'] = {'css':css, 'logo':logo, 'membership':membership,
+            'add':False, 'post_save_redirect':redirect}
+    return update_object(request, **kwargs)
+
+def add_author(request, **kwargs):
+    if request.user.is_anonymous():
+        return HttpResponseRedirect(settings.URLBASE +'/accouns/login/')
+    manipulator = Author.AddManipulator()
+    if request.POST:
+        new_data = request.POST.copy()
+        errors = manipulator.get_validation_errors(new_data)
+        if not errors:
+            manipulator.do_html2python(new_data)
+            new_author = manipulator.save(new_data)
+            return render_to_response('publications/author_done.html', 
+                    {'author':new_author, 'css':settings.DEFAULT_CSS,},)
+
+    else:
+        errors = new_data = {}
+    form = forms.FormWrapper(manipulator, new_data, errors)
+    return render_to_response('publications/author_form.html', {'form': form,
+            'css':settings.DEFAULT_CSS,},)
+
+
+def search(request, **kwargs):
+    rg = request.REQUEST.get
+    group = kwargs.get("group", False)
+    q = rg("q", None)
+    if not q:
+        return HttpResponseRedirect("%s/publications/" % settings.URLBASE)
+
+    search_fields = ['title', 'abstract', 'authorship__author__last_name',
+            'publication_name', 'book_title']
+
+    q = rg("q", "")
+    if not q.split() == []:
+        for bit in q.split():
+            or_queries = [Q(**{'%s__search' % field_name: bit}) for field_name
+                in search_fields]
+            qs = QuerySet(Publication)
+            qs = qs.filter(reduce(operator.or_, or_queries)).distinct() 
+    else:
+        qs = Publication.objects.all()[:0]
+    if group:
+        g = Group.objects.get(acronym=group)
+        qs = qs.filter(groupship__group=g)
+    	css = g.defaultcss
+    	logo = g.get_logo_url()
+        del kwargs['group']
+    else:
+    	css = settings.DEFAULT_CSS
+    	logo = settings.DEFAULT_LOGO
+        g = False
+    kwargs["queryset"] = qs
+    kwargs["allow_empty"] = True
+    
+    #query = Q(title__search=q) | \
+     #       Q(abstract__search=q) | \
+      #      Q(authorship__author__last_name__search=q) | \
+       #     Q(publication_name__search=q)
+        #    #Q(editorship__editor__last_name__search=q)  
+    #if rg("year"):
+    #    query &= Q(year__exact=rg("year"))
+    #if rg("journal"):
+    #    query &= Q(journal__icontains=rg("journal", ""))
+    #if rg("author"):
+    #    query &= Q(authorship__author__last_name__exact=rg("author"))
+    
+    d = request.GET.copy()
+    if  "page" in d:
+        del d["page"]
+    if  "submit" in d:
+        del d["submit"]
+    kwargs["extra_context"] = {"query": urlencode(d), "query_readable": d["q"],
+            "group": g, "css": css, "logo": logo}
+ 
+    return object_list(request, **kwargs)
+
+
+def grouppub(request, **kwargs):
+    #filter pubs by group and send on to generic view
+    group = kwargs.get("group", False)
+    g = get_object_or_404(Group, acronym=group)
+    query = Publication.objects.filter(groupship__group=g)
+    kwargs["queryset"] = query
+    kwargs["allow_empty"] = True
+    kwargs["paginate_by"] = 8
+    del kwargs["group"]
+    kwargs["extra_context"] = {"css":g.defaultcss, "logo":g.get_logo_url(),
+            "group": g}
+    
+    return object_list(request, **kwargs)
+    
+def personpub(request, **kwargs):
+    #filter pubs by person and send on to generic view
+    from esmg.people.models import Person
+    slug = kwargs.get("slug", False)
+    group = kwargs.get("group", False)
+    p = get_object_or_404(Person, slug__exact=slug)
+    query = Publication.objects.filter(authorship__author__person=p)
+    kwargs["queryset"] = query
+    kwargs["allow_empty"] = True
+    kwargs["paginate_by"] = 8
+    del kwargs["slug"]
+    if group:
+        g = Group.objects.get(acronym=group)
+    	css = g.defaultcss
+    	logo = g.get_logo_url()
+        del kwargs["group"]
+    elif p.css:
+        css = c.css
+        logo = settings.DEFAULT_LOGO
+        g = False
+    else:
+    	css = settings.DEFAULT_CSS
+    	logo = settings.DEFAULT_LOGO
+        g = False
+    kwargs["extra_context"] = {"css":css, "logo":logo, "group":g, "person":p}
+    
+    return object_list(request, **kwargs)    
+
+def detail(request, **kwargs):
+    group = kwargs.get("group", False)
+    query = Publication.objects.all()
+    kwargs["queryset"] = query
+    if group:
+        g = Group.objects.get(acronym=group)
+    	css = g.defaultcss
+    	logo = g.get_logo_url()
+        del kwargs["group"]
+    else:
+    	css = settings.DEFAULT_CSS
+    	logo = settings.DEFAULT_LOGO
+        g = False
+    kwargs["extra_context"] = {"css":css, "logo":logo, "group":g}
+    return object_detail(request, **kwargs)
+        

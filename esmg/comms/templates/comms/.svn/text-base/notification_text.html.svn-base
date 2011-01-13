@@ -1,0 +1,15 @@
+{% extends "base_mail.html" %}
+
+{% block title %}[researchpages]: {{title}}{% endblock %}
+{% block body %}
+<h2>{{type}} from {{from}}{% ifnotequal type "Friend request" %}: {{title}}{% endifnotequal %}</h2>
+
+<p>{{body|escape|linebreaksbr}}</p>
+
+ {% ifequal type "Friend request" %}
+ <p>To confirm this request, please go to <a href="{{url}}">{{url}}</a></p>
+ {% else %}
+ <p>To view this {{type}} online, reply or add a comment, go to <a href="{{url}}">{{url}}</a></p>
+ {% endifequal %}
+ <p>Researchpages: <a href="{{recipient.get_absolute_url}}">Go to your page</a> | <a href="{{recipient.get_edit_url}}">Edit your details</a></p>
+ {% endblock %}

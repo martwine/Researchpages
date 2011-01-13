@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% load markup %}
+{% load publications %}
+
+{% block title %}{{ object }}{% endblock %}
+
+{% block content %}
+    <div id="main">
+      <h1>{{ object.title}}</h1>
+    <p>{{ object.body|textile }}</p>
+    <p>{{object.time|date:"d/m/y"}} {{ object.time|date:"G:i" }}</p>
+    {% if object.has_comments %}
+    <h2>Comments</h2>
+    {% for comment in object.comment_set.all %}
+    <div class="result">
+      <ul>
+        <li class="object_heading">{{comment.person}} says</li>
+        <li class="object_detail">{{comment}}</li>
+        <li class="object_notes">{{comment.time|date:"d/m/y"}} {{ comment.time|date:"G:i" }}</li>
+    </ul>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% if form %}
+    <div id="commentform">
+      <h3>Add comment</h3>
+      <form method="post" action="">
+        {{form.as_p}}
+        <p class="submit"><input type="submit" name="" value="Post"></p>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+  <div id="sidebar">
+    {% if editlink %}
+      <div id="actions" class="sidebar-block">
+        <h2>Actions</h2>
+        <ul>
+          <li>
+          <a href="../edit/{{ object.id }}/">Edit item</a>
+          </li>
+        </ul>
+      </div>
+    {% endif %}
+    {% include "pagenav-snippet.html" %}
+  </div>
+{% endblock %}

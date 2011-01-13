@@ -1,0 +1,23 @@
+{% extends "base_message.html" %}
+
+{% block title %}Confirm friend requests{% endblock %}
+
+{% block content %}
+<div id="message">
+  {% ifequal requesters.count 0 %}
+  <h1>No pending friend requests</h1>
+  {% else %}
+  <h1>Confirm friend requests</h1>
+<form action="" method="post" enctype="multipart/form-data">
+  {% for req in requesters %}
+  <p>
+  {{req}}
+  <input type="radio" name="{{req.user_id}}" value="confirm" checked>Confim
+  <input type="radio" name="{{req.user_id}}" value="deny">Deny
+  </p>
+  {% endfor %}
+  <p class="submit"><input type="submit" name="submit" value="submit"></p>
+</form>
+</div>
+{% endifequal%}
+{% endblock %}

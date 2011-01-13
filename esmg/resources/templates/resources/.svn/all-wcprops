@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/repos/apparatus/!svn/ver/586/resources/templates/resources
+END
+popup_list.html
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/repos/apparatus/!svn/ver/339/resources/templates/resources/popup_list.html
+END
+resource_list.html
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/repos/apparatus/!svn/ver/604/resources/templates/resources/resource_list.html
+END
+resource_info.html
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/repos/apparatus/!svn/ver/1/resources/templates/resources/resource_info.html
+END
+deleteform.html
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/repos/apparatus/!svn/ver/585/resources/templates/resources/deleteform.html
+END
+resource_detail.html
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/repos/apparatus/!svn/ver/45/resources/templates/resources/resource_detail.html
+END
+resource_form.html
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/repos/apparatus/!svn/ver/583/resources/templates/resources/resource_form.html
+END
+resource_detail_snippet.html
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/repos/apparatus/!svn/ver/583/resources/templates/resources/resource_detail_snippet.html
+END

@@ -1,0 +1,64 @@
+{% extends "base_message.html" %}
+
+{% load markup %}
+
+{% block title %}Create a sidebar{% endblock %}
+
+{% block content %}
+  <div id="message">
+  <h1>Create a sidebar</h1>
+    <form action="" method="post">
+        <p>
+        <label for="{{ form.name.get_id }}">Title</label>
+        {{ form.name }}
+        {% if form.name.errors %}<ul class="errorlist">{{ form.name.html_error_list }}</ul>{% endif %}
+        </p>
+        <p>
+        <label for="{{ form.creator.get_id }}">Editor</label>
+        {{ form.creator }}
+        {% if form.creator.errors %}<ul class="errorlist">{{ form.creator.html_error_list }}</ul>{% endif %}
+        </p>
+        <p>
+        <label for="{{ form.body.get_id }}">Content</label>
+        {{ form.body }}
+        {% if form.body.errors %}<ul class="errorlist">{{ form.body.html_error_list }}</ul>{% endif %}
+        </p>
+        <p class="form-note">The content for this sidebar. You can use
+          <a href="http://hobix.com/textile/" target="_blank">Textile</a> to
+          format your text.
+        </p>
+
+        <p class="form-note">
+        <a href="{{ urlbase }}/resources/popup/" target="_blank"
+        onclick="window.open('{{ urlbase }}/resources/popup/', 'add', 
+        'width=500,height=450,toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes'); 
+        return false;">Find a picture, document or file to add to this 
+        page</a>
+        </p>
+        <p class="form-note">
+        <a href="{{ urlbase }}/resources/add/" target="_blank"
+        onclick="window.open('{{ urlbase }}/resources/add/', 'add', 
+        'width=500,height=450,toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes'); 
+        return false;">Upload a picture, document or other file</a>
+        </p>
+        <p>
+        <label for="id_group">Project</label>
+        <select id="id_group" class="vSelectField" name="group" size="1">
+        <option value="" selected="selected">------</option>
+          {% if membership %}
+            {% for m in membership %}
+              <option value="{{m.group.id}}">{{m.group}}</option>
+          {% endfor %}
+          {% endif %}
+        </select>
+        {% if form.group.errors %}<ul class="errorlist">{{ form.group.html_error_list }}</ul>{% endif %}
+        </p>
+        <p class="form-note">If you want this item to appear in the list of 
+    sidebars assoicated with a particular group or project, select it here. Otherwise, only you will be able to use the sidebar.
+        </p>
+        <p>
+        <input type="submit" value="Save">
+        </p>
+    </form>
+  </div>
+{% endblock %}  

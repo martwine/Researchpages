@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 30
+/repos/apparatus/!svn/ver/587/
+END
+esmg.conf
+K 25
+svn:wc:ra_dav:version-url
+V 37
+/repos/apparatus/!svn/ver/1/esmg.conf
+END
+manage.py
+K 25
+svn:wc:ra_dav:version-url
+V 37
+/repos/apparatus/!svn/ver/1/manage.py
+END
+django
+K 25
+svn:wc:ra_dav:version-url
+V 34
+/repos/apparatus/!svn/ver/1/django
+END
+textify.py
+K 25
+svn:wc:ra_dav:version-url
+V 40
+/repos/apparatus/!svn/ver/551/textify.py
+END
+__init__.py
+K 25
+svn:wc:ra_dav:version-url
+V 39
+/repos/apparatus/!svn/ver/1/__init__.py
+END
+my.cnf
+K 25
+svn:wc:ra_dav:version-url
+V 36
+/repos/apparatus/!svn/ver/541/my.cnf
+END
+urls.py
+K 25
+svn:wc:ra_dav:version-url
+V 37
+/repos/apparatus/!svn/ver/590/urls.py
+END

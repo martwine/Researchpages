@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/repos/apparatus/!svn/ver/515/publications/templates/publications
+END
+publication_form.html
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/repos/apparatus/!svn/ver/477/publications/templates/publications/publication_form.html
+END
+form-snippet.html
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/repos/apparatus/!svn/ver/468/publications/templates/publications/form-snippet.html
+END
+publication_list.html
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/repos/apparatus/!svn/ver/599/publications/templates/publications/publication_list.html
+END
+publication_detail.html
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/repos/apparatus/!svn/ver/611/publications/templates/publications/publication_detail.html
+END

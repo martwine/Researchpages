@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block header_extra %}
+  <meta name="verify-v1" content="uXoGT3NC/SZQtTBPh3vad2aB+eUY8wSH50psvThKYuM=" />
+{% endblock %}
+
+{% block title %}Welcome{% endblock %}
+{% block description %}Free website for scientists and research projects / 
+groups. Set up your own online community of scientists. Promote your research 
+and your projects' research. No html editing, no ftp, do everything through a 
+web browser. {% endblock %}
+{% block keywords %}Science web, sciweb, researchpages, research pages, website 
+for scientists, home page, science space, scispace, social networking site for 
+scientists {% endblock %}
+
+{% block content %}
+   {% include "apparatus/content_block.html" %}
+   
+{% endblock %}
+

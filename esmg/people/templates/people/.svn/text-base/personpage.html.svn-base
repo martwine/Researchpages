@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}{{ pagecontent.title }}{% endblock %}
+
+{% block keywords %}{% firstof keywords person.keywords group.keywords %}{% endblock %}
+{% block description %}{% firstof keywords person.description group.description %}{% endblock %}
+
+{% block content %}
+   {% include "apparatus/content_block.html" %}
+{% endblock %}
+

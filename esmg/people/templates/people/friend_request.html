@@ -1,0 +1,16 @@
+{% extends "base_message.html" %}
+
+{% block title %}Request friend{% endblock %}
+
+{% block content %}
+<div id="message">
+  <h1>Friend request: {{friend}}</h1>
+<form action="" method="post" enctype="multipart/form-data">
+  <p class="form-note">A request will be sent to {{friend}} when you click 
+  'send'. You can add a 
+  personal message below if you wish</p>
+  {{rform.as_p}}
+    <p class="submit"><input type="submit" name="submit" value="send"></p>
+</form>
+</div>
+{% endblock %}

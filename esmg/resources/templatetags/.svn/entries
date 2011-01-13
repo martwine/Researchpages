@@ -1,0 +1,53 @@
+8
+
+dir
+587
+http://svn.researchpages.co.uk/repos/apparatus/resources/templatetags
+http://svn.researchpages.co.uk/repos/apparatus
+
+
+
+2007-10-15T11:42:34.173321Z
+583
+martin
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+abf93926-5328-0410-a704-dd263852005c
+
+resources.py
+file
+
+
+
+
+2007-10-15T11:42:45.000000Z
+a9b508fbecc599da5d729e14b17a1ecc
+2007-10-15T11:42:34.173321Z
+583
+martin
+has-props
+
+__init__.py
+file
+
+
+
+
+2007-10-15T11:42:45.000000Z
+d41d8cd98f00b204e9800998ecf8427e
+2007-10-15T11:42:34.173321Z
+583
+martin
+

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Send message{% endblock %}
+
+{% block content %}
+<div id="bigform">
+  <h1>Send a message</h1>
+  <form action="" method="post">
+    <h2>Recipients</h2>
+    <p class="form-note">Select any number of groups and friends simultaneously</p>
+    {{rform.as_p}}
+    
+    <h2>Message</h2>
+    {{mform.as_p}}
+
+    <p class="submit"><input type="submit" value="submit" name="submit"/></p>
+  </form>
+</div>
+
+{% endblock %}

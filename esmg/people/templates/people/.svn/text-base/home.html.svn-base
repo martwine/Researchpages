@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% load publications %}
+{% load pdetails_extras %}
+{% load home %}
+{% load markup %}
+
+{% block title %}{{ person.name }}: home {% endblock %}
+{% block keywords %}{{person.keywords}}{% endblock %}
+{% block description %}{{person.description}}{% endblock %}
+
+
+{% block content %}
+
+<div id="home">
+  <div id="latest">
+    <h1>Latest notifications</h1>
+    {% for notification in latest %}
+    <ul>
+      <li class="object_heading">{{notification.notification_type}}</li>
+      <li class="object_subtitle"><a href="{{notification.url}}">{{notification.title}}</a></li>
+      <li class="object_details">{{notification.body|textile|truncatewords:"25"}}</li>
+      <li class="object_url"><a href="{{notification.url}}">{{notification.url|truncatemid:"20"}}</a></li>
+    </ul>
+    {% endfor %}
+  </div>
+  
+  {% ifnotequal person.groups.count 0 %}
+      {% for group in person.groups %}
+      {% if group.newscount or group.eventscount %}
+        <div class="group">
+          <h2><a href="{{group.get_absolute_url}}">{{group}}</a></h2>
+          {% if group|is_manager:person %}
+          <p class="action"><a href="{{group.get_absolute_url}}/manage/">Manage group</a></p>
+          {% endif %}
+          {% if group.newscount %}
+              <h3>News</h3>
+              {% for news in group.news %}
+                <ul>
+                  <li class="object_heading">{{news.title}}</li>
+                  <li class="object_details">{{news.body|textile|dehtmlise|truncatewords:"15"}}</li>
+                  <li class="object_url"><a href="{{group.get_absolute_url}}/news/{{news.id}}">more</a></li>
+                </ul>
+              {% endfor %}
+              {% endif %}
+              {% if group.eventscount %}
+              <h3>Events</h3>
+              {% for news in group.events %}
+                <ul>
+                  <li class="object_heading">{{news.title}}</li>
+                  <li class="object_details">{{news.body|textile|dehtmlise|truncatewords:"15"}}</li>
+                  <li class="object_url"><a href="{{group.get_absolute_url}}/news/{{news.id}}">more</a></li>
+                </ul>
+              {% endfor %}
+              {% endif %}
+        </div>
+        {% endif %}
+      {% endfor %}
+    {% endifnotequal %}
+    
+    {% ifnotequal person.groups.count 0  %}
+    <div id="groups">
+      <h2>Groups</h2>
+      <ul>
+        {% for group in person.groups %}
+        <li><a href="{{group.get_absolute_url}}">{{group}}</a>
+          {% if group|is_manager:person %}
+          <a class="action" href="{{group.get_absolute_url}}/manage/">(Manage)</a>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endifnotequal %}
+    {% if person.has_friends %}
+    <div id="friends">
+      <h2>Friends</h2>
+      <ul>
+      {% for friend in person.friends.all %}
+      <li class="object_detail"><a href="{{friend.get_absolute_url}}">{{friend}}</a></li>
+      {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+</div>
+    
+<div id="sidebar" class="narrow">
+      <div class="sidebar-block" id="actions">
+        <h2>Actions</h2>
+        <ul>
+            <li><a href="{{ person.get_edit_url }}">Edit my details</a></li>
+            <li><a href="../messages/send">Send a message</a></li>
+            <li><a href="{{ person.get_absolute_url }}publications/add/">Add a publication</a></li>
+            <li><a href="{{ urlbase }}/resources/add/">Upload a file</a></li>
+            <li><a href="{{ person.get_absolute_url }}blog/post/">Add a blog post</a></li>
+       </ul>
+      </div>
+      {% if person.get_page_editorships %}
+        <div class="sidebar-block">
+          <h2>Sitewide list of pages you edit</h2>
+          <ul class="actions">
+            {% for page in person.get_page_editorships %}
+            <li class="clearlist"><a href="{{ page.get_absolute_url }}">{% if page.pcontent.latest %}{{ page.pcontent.latest.title }}{% else %}{{ page.identifier }}{% endif %}</a> ({{page.uri|truncatemid:"10"}})</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+      {% include 'pagenav-snippet.html' %}    
+  </div>
+  <div id="footer">
+  </div>
+{% endblock %}
+

@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/repos/apparatus/!svn/ver/522/comms/templates/comms
+END
+message_list.html
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/repos/apparatus/!svn/ver/521/comms/templates/comms/message_list.html
+END
+item_detail.html
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/repos/apparatus/!svn/ver/493/comms/templates/comms/item_detail.html
+END
+item_form.html
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/repos/apparatus/!svn/ver/477/comms/templates/comms/item_form.html
+END
+notification_text.txt
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/repos/apparatus/!svn/ver/494/comms/templates/comms/notification_text.txt
+END
+message_form.html
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/repos/apparatus/!svn/ver/502/comms/templates/comms/message_form.html
+END
+notification_detail.html
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/repos/apparatus/!svn/ver/521/comms/templates/comms/notification_detail.html
+END
+item_list.html
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/repos/apparatus/!svn/ver/605/comms/templates/comms/item_list.html
+END
+notification_text.html
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/repos/apparatus/!svn/ver/522/comms/templates/comms/notification_text.html
+END

@@ -1,0 +1,12 @@
+{% extends "base_popup.html" %}
+
+{% block title %}Done{% endblock %}
+
+{% block content %}
+<h1>All done</h1>
+<p>Your institution will now be available as a choice on your 'edit details' 
+page</p>  
+
+
+<p>Please close this window.</p>
+{% endblock %}

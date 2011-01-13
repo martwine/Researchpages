@@ -1,0 +1,20 @@
+{% extends "base_message.html" %}
+
+{% block title %}Delete &ldquo;{{ resource }}&rdquo;{% endblock %}
+
+{% block content %}
+
+  <div id="message">
+  <h1>Delete &ldquo;{{ resource }}&rdquo;</h1>
+    <p class="error"> Are you sure you want to delete {{resource}}?</p>
+    <p>{{ resource.title }}</p>
+    <p>{{ resource.description }}</p>
+    {% ifequal resource.type "pic" %}
+    <img src="{{resource.get_file_url}}" alt="{{ resource.description }}" /> 
+    {% endifequal %}
+    <form action="" method="post">
+      <input type="submit" name="submit" value="Confirm">
+      <input type="submit" name="submit" value="Cancel">
+    </form>
+  </div>
+{% endblock %}  

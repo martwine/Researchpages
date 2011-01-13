@@ -1,0 +1,100 @@
+{% extends "base_popup.html" %}
+
+{% block title %}Resources{% endblock %}
+
+{% block content %}
+  <h2>Resources</h2>
+
+  {% if object_list %}
+    <p class="message-hint">Choose a picture, document or file to see how to 
+    include it in your page.</p>
+    <ul>
+      {% for object in object_list %}
+        
+        {% ifequal object.permissions 'pblc' %}
+          <li>
+            {{object.title}}<br>
+            {{ object.description }}
+            <a href="{{ urlbase }}/resources/{{ object.id }}/info/">{{ object }}</a><br />
+          </li>
+        {% endifequal %}
+
+        {% ifequal object.permissions 'rstrc' %}
+          {% if not request.user.is_anonymous %}
+            <li>
+              {{object.title}}<br>
+              {{ object.description }}
+              <a href="{{ urlbase }}/resources/{{ object.id }}/info/">{{ object }}</a><br />
+            </li>
+          {% endif%}
+        {% endifequal%}
+        
+        {% ifequal object.permissions 'prvt' %}
+          {% if grouptest  %}
+            <li>
+              {{object.title}}<br>
+              {{ object.description }}
+              <a href="{{ urlbase }}/resources/{{ object.id }}/info/">{{ object }}</a><br />
+            </li>
+          {% else %}
+            {% ifequal person user.person  %}
+              <li>
+                {{object.title}}<br>
+                {{ object.description }}
+                <a href="{{ urlbase }}/resources/{{ object.id }}/info/">{{ object }}</a><br />
+              </li>
+            {% else %}
+              {% ifequal object.person user.person  %}
+                <li>
+                  {{object.title}}<br>
+                  {{ object.description }}
+                  <a href="{{ urlbase }}/resources/{{ object.id }}/info/">{{ object }}</a><br />
+                </li>
+              {% endifequal %}
+            {% endifequal %}
+          {% endif %}
+        {% endifequal%}
+      
+      {% endfor %}
+    </ul>
+    {% include "pagination/list.html" %}
+  {% else %}
+    <p class="message-hint">No resources were found. <a
+    href="{{ urlbase }}/resources/add/">Upload one now</a>.</p>
+  {% endif %}
+{% endblock %}
+
+<!--
+# permissions test (now redundant) from resources.models
+#
+   # def is_viewable(self, user, type, group, person):
+   #     """Return true if user can view this resource"""
+   #     if self.permissions == 'pblc':
+   #         return True
+   #     elif self.permissions == 'rstrc':
+   #         return not user.is_anonymous()
+   #     elif self.permissions == 'prvt':
+   #         if group:
+   #             test1 = group.membership_set.filter(person=user.person).count() > 0
+   #         else: 
+   #             test1 = False
+   #         if person:
+   #             test2 = user.person == person
+   #         else:
+   #             test2 = False
+   #         if type == 'group_list':
+   #             return test1
+   ##         elif type == 'person_list':
+   #             return test2
+   #         # for global resource list
+   #         else:
+   #             return test1 or test2
+   # 
+    
+
+
+
+        
+
+
+-->

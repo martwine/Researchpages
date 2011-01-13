@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+
+{% load publications %}
+
+{% block title %}{{ object }}{% endblock %}
+
+{% block content %}
+
+  {% if object %}
+  <div id="main">
+    <h2>{{ object.title}}</h2>
+    <p class="authors">
+      {% for authorship in object.authorship_set.all %}
+        {% if authorship.author.person %}
+          {% if group %}
+            {{ authorship.author.person|get_link_html:group }}
+          {% else %}
+            <a href="{{ authorship.get_absolute_url }}">
+          {% endif %}
+        {% endif %}
+        {{ authorship }}
+        {% if authorship.author.person %}
+          </a>
+        {% endif %}
+        {% if not forloop.last %}
+          ,
+        {% endif %}
+      {% endfor %}
+    </p>
+    <!--<p class="authors">
+      {% for authorship in object.authorship_set.all %}
+      {% if authorship.author.person %}{% if group %}<a href="{{group.get_absolute_url}}/people/{{authorship.get_person_slug}}">{% else %}<a href="{{ authorship.get_absolute_url }}">{% endif %}{% endif %}{{ authorship }}{% if authorship.author.person %}</a>{% endif %}{% if not forloop.last %},{% endif %}
+      {% endfor %}
+      </p> -->
+    <p class="abstract">{{ object.abstract}}</p>
+    <p class="details">{{ object.details }}</p>
+    {% if object.get_best_link %}
+      <p class="link"><a href="{{ object.get_best_link }}">{{ object.get_best_link|truncatemid:"30" }}</a></p>
+    {% endif %}
+    {% if object.file  %}
+      <a href="{{urlbase}}/media/{{object.file}}">{{object.filename}}</a>
+    {% endif %}
+    {% if object.suppinfolink %}
+    <p class="link"><a href="{{ object.suppinfolink }}">Supplementary info</a></p>
+    {% endif %}
+  {% endif %}
+  </div>
+  <div id="sidebar">
+    {% if not user.is_anonymous %}
+    <div class="sidebar-block" id="actions">
+      <h2>Actions</h2>
+      <ul>
+  {% for authorship in object.authorship_set.all %}
+    {% if authorship.author.person %}
+      {% ifequal user.person authorship.author.person %}
+      <li><a href="{% if group %}{{group.get_absolute_url}}{% else %}{{urlbase}}{% endif %}/publications/edit/{{object.id}}">Edit the details of this publication</a></li>
+      {% endifequal %}
+    {% endif %}
+    {% endfor %}
+    <li><a href="{% if group %}{{group.get_absolute_url}}{% else %}{{urlbase}}{% endif %}/publications/add">Add a publication</a></li> 
+      </ul>
+  </div>
+    {% endif %}
+    {% include "pagenav-snippet.html" %}
+  </div>
+{% endblock %}

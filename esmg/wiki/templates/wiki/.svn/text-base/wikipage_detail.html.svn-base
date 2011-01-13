@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load wikify %}
+{% load home %}
+{% load markup %}
+{% block title %}{{group}} wiki: {{object.title}} {% endblock %}
+{% block content %}
+  <div id="main">
+    <h1>{{ object.wpcontent.latest.title }}</h1>
+    {{ object.wpcontent.latest.body|textile|wikify:group|safe }}
+  </div>
+  <div id="sidebar">
+  {% if edit %}
+    <div class="sidebar-block" id="actions">
+      <h2>Actions</h2>
+      <ul>
+        <li><a href="edit/">Edit this wiki page</a></li>
+      </ul>
+    </div>
+  {% endif %}
+  {% include "pagenav-snippet.html" %}
+  </div>
+  <div id="footer">
+    Last updated at {{ object.wpcontent.latest.last_updated|date:"G:i" }} on 
+    {{ object.wpcontent.latest.last_updated|date:"d/m/Y" }} by <a href="{% if group|is_member:user.person %}{{group.get_absolute_url}}/people/{{object.locked_by.slug}}{% else %}{{ object.locked_by.get_absolute_url }}{% endif %}/">{{ object.locked_by }}</a>
+  </div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base_message.html" %}
+
+{% load markup %}
+
+{% block title %}Confirm version change for &ldquo;{{ pagecontent.title }}&rdquo;{% endblock %}
+
+{% block actions %}
+  <ul>
+    <li class="action-label">Actions</li>
+    {% if group %}
+    <li><a href="{{ urlbase }}/{{group}}{{ page.uri }}">Return to page</a></li>
+    <li><a href="{{ urlbase }}/{{group}}{{ page.uri }}edit/">Return to edit page</a></li>
+    {% else %}
+    <li><a href="{{ urlbase }}{{ page.uri }}">Return to page</a></li>
+    <li><a href="{{ urlbase }}{{ page.uri }}edit/">Return to edit page</a></li>
+    {% endif %}
+  </ul>
+{% endblock %}
+
+{% block content %}
+
+  <div id="wide">
+  <h1>Confirm version change for &ldquo;{{ pagecontent.title }}&rdquo;</h1>
+    <p class="message-info">Please confirm that you would like to revert to this 
+    version. Subsequent versions will not be lost.</p>
+    <div id="preview">
+      {{ pagecontent.body|textile }}
+    </div>
+    <form action="" method="post">
+      <input type="hidden" name="versionpost" value="post">
+      <input type="submit" value="Use this version">
+    </form>
+  </div>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<div id="pagetop">	
+		{% if logo %}
+      {% if group %}
+        <a href="{{ group.get_absolute_url }}" id="logo">
+          <img src="{{logo}}" width="140" height="80" alt="{{group}}">
+        </a>
+      {% else %}
+        <a href="{{ urlbase }}" id="logo">
+          <img src="{{logo}}" width="140" height="80" alt="{{urlbase}}">
+        </a>
+      {% endif %}
+    {% endif %}
+    <h1 id="pagetoptitle">{% firstof group person "ResearchPages" %}</h1>
+    {% if group.subtitle %}
+      <h2 id="pagetopsubtitle">{{group.subtitle}}</h2>
+    {% endif %}
+    <div id="pagenav">
+      <ul>
+        {% if group %}
+          <li><a href="{{ group.get_absolute_url }}/people/">People</a></li>
+          <!-- <li><a href="{{ group.get_absolute_url }}/projects/">Projects</a></li> -->
+          <!-- <li><a href="{{ group.get_absolute_url }}/news/">News</a></li> -->
+          <li><a href="{{ group.get_absolute_url }}/publications/">Publications</a></li>
+          <li><a href="{% if group %}{{ group.get_absolute_url }}/resources/">Resources</a></li>
+          {% if group.children %}   
+            {% for child in group.children %}
+              <li><a href="{{ child.get_absolute_url }}">{{child.pcontent.latest.title}}</a></li>
+            {% endfor %}
+          {% endif %}
+        {% else %}
+          {% if person %}
+            <!-- <li><a href="{{ group.get_absolute_url }}/projects/">Projects</a></li> -->
+            <!-- <li><a href="{{ group.get_absolute_url }}/news/">News</a></li> -->
+            <li><a href="{{person.get_absolute_url}}/publications/">Publications</a></li>
+            <li><a href="{{person.get_absolute_url}}/resources/">Resources</a></li>
+          {% else %}
+            <li><a href="{{ urlbase }}/people/">People</a></li>
+            <!-- <li><a href="{{ group.get_absolute_url }}/projects/">Projects</a></li> -->
+            <!-- <li><a href="{{ group.get_absolute_url }}/news/">News</a></li> -->
+            <li><a href="{{ urlbase }}/publications/">Publications</a></li>
+            <li><a href="{{ urlbase }}/resources/">Resources</a></li>
+          {% endif %}
+        {% endif %} 
+      </ul>
+    </div>
+  </div>
+  
+  <div id="contentwrapper">
+    {% block actions %}{% endblock %}
+    <div id="main" class="wide">
+      <h1>{% block heading %}Items{% endblock %}</h1>
+        {% if not object_list %}
+          {% if query_readable %}
+            <p class="message-error">No
+            {% block error_type_search %}items{% endblock %} matching
+            &ldquo;{{ query_readable }}&rdquo; were found.</p>
+          {% else %}
+            <p class="message-error">No {% block error_type %}items{% endblock %} 
+            were found.</p>
+          {% endif %}
+        {% else %}
+          {% block preamble %}{% endblock %}
+
+          {% for object in object_list %}
+            {% block object %}{% endblock %}
+          {% endfor %}
+
+          {% include "pagination/list.html" %}
+        {% endif %}
+  </div>
+  {% block sidebar %}{% endblock %}
+  {% block footer %}{% endblock %}
+</div>  
+{% endblock %}

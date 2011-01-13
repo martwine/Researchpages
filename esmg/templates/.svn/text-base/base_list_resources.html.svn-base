@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% block actions %}{% endblock %}
+    <div id="main" class="wide">
+      <h1>{% block heading %}Items{% endblock %}</h1>
+        {% if not object_list %}
+          {% if query_readable %}
+            <p class="message-error">No
+            {% block error_type_search %}items{% endblock %} matching
+            &ldquo;{{ query_readable }}&rdquo; were found.</p>
+          {% else %}
+            <p class="message-error">No {% block error_type %}items{% endblock %} 
+            were found.</p>
+          {% endif %}
+        {% else %}
+          {% block preamble %}{% endblock %}
+
+            {% block object_list %}{% endblock %}
+
+          {% include "pagination/list.html" %}
+        {% endif %}
+  </div>
+  {% block sidebar %}{% endblock %}
+  {% block footer %}{% endblock %}
+{% endblock %}

@@ -1,0 +1,10 @@
+  {% ifnotequal person.groups.count 0 %}
+    <div class="sidebar-block">
+        <h2>Groups</h2>
+        <ul>
+            {% for group in person.groups %}
+                <li><a href="{{group.get_absolute_url}}">{{group}}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+  {% endifnotequal %}

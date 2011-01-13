@@ -1,0 +1,35 @@
+{% extends "base_list.html" %}
+
+{% block title %}Groups{% endblock %}
+{% block heading %}Groups{% endblock %}
+{% block error_type %}groups{% endblock %}
+{% block error_type_search %}projects{% endblock %}
+{% block list_type %}groups{% endblock %}
+
+{% block object %}
+  <div class="result">
+    <ul>
+      <li class="object_heading">
+        <a href="{{ object.get_absolute_url }}">{{ object.name }}</a>
+      </li>
+      <li class="object_details">{{ object.description }}</li>
+      <li class="object_note"><a href="{{ object.get_absolute_url }}">{{ object.get_absolute_url }}</a></li>
+    </ul>
+  </div>
+{% endblock %}
+
+{% block sidebar %}
+<div id="sidebar" class="narrow">
+    {% if user.is_staff %}
+  <div class="sidebar-block" id="actions">
+    <h2>Actions</h2>
+    <ul>
+      <li><a href="{{ urlbase }}/admin/groups/group/">Edit projects</a></li>
+      <li><a href="{{ urlbase }}/admin/groups/group/add/">Add a new 
+      project or group</a></li>
+    </ul>
+  </div>
+    {% endif %}
+    {% include "pagenav-snippet.html" %}
+  </div>
+{% endblock %}

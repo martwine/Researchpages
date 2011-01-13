@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}{{ pagecontent.title }}{% endblock %}
+
+{% block content %}
+   {% include "apparatus/content_block.html" %}
+{% endblock %}
+
+
+{% block attrs %}
+  Last updated at {{ pagecontent.time|date:"G:i" }} on
+  {{ pagecontent.time|date:"d/m/Y" }} by
+  <a href="{{ pagecontent.last_editor.get_absolute_url }}">{{ pagecontent.last_editor }}</a>.
+{% endblock %}

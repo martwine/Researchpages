@@ -1,0 +1,30 @@
+{% extends "base_message.html" %}
+
+{% block title %}Password Reset{% endblock %}
+
+{% block content %}
+
+  <div id="message">
+  <h1>Password reminder</h1>
+    {% if sent %}
+      <p class="message-info">Your password reminder has been sent. Please
+      check your email.</p>
+      <p>Return to the <a href="{{ urlbase }}/accounts/login/">log in
+      page</a>.</p>
+    {% else %}  
+      <p class="message-hint">Please enter your email address and your password
+      reminder will be emailed to you.</p>
+      <form method="post" action="">
+        <div class="form-line">
+          <label for="{{ form.email.get_id }}">Email address</label>
+          {{ form.email }}
+          {% if form.email.errors %}<ul class="errorlist">{{ form.email.html_error_list }}</ul>{% endif %}
+        </div>
+
+        <div class="form-submit">
+          <input type="submit" value="Send reminder">
+        </div>
+      </form>
+    {% endif %}
+  </div>
+{% endblock %}

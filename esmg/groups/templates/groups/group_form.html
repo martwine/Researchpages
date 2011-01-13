@@ -1,0 +1,33 @@
+{% extends "base_message.html" %}
+
+{% block title %}{{group}}: management{% endblock %}
+
+{% block content %}
+<div id="message">
+  <h1>{{group}} settings</h1>
+<form action="" method="post" enctype="multipart/form-data">
+  <h2>General details</h2>
+  <ul>
+    {{manageform.as_p}}
+</ul>
+<p class="submit"><input type="submit" name="submit" value="save"></p>
+</form>
+
+<form action="" method="post">
+  <h2>Subscribe group members from exiting site members</h2>
+  <ul>
+    {{mbform.as_p}}
+</ul>
+<p class="submit"><input type="submit" name="submit" value="add"></p>
+</form>
+
+<form action="" method="post">
+  <h2>Subscribe non-site members</h2>
+  <ul>
+    {{pform.as_p}}
+</ul>
+<p class="submit"><input type="submit" name="submit" value="subscribe"></p>
+</form>
+
+</div>
+{% endblock %}

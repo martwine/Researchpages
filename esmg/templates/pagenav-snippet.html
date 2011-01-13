@@ -1,0 +1,82 @@
+{% load home %}
+      <div class="sidebar-block" id="pagenav">
+        <h2>Navigation</h2>
+          {% if person %}
+          <h3>{% ifequal user.person.slug person.slug %}My{%else%}{{person.first_name}}'s{%endifequal%} pages</h3>
+            <ul>
+              <li class="noindent"><a href="{% if group %}{{group.get_absolute_url}}/people/{{person.slug}}/{%else%}{{person.get_absolute_url}}{%endif%}">{%ifequal user.person.user_id person.user_id %}My{%else%}{{person.first_name}}'s{%endifequal%} page</a></li>
+              {% if person.blogcount %}
+              <li><a href="{% if group %}{{group.get_absolute_url}}/people/{{person.slug}}/blog{% else %}{{person.get_absolute_url}}blog{% endif %}/">{%ifequal user.person.user_id person.user_id %}My{%else%}{{person.first_name}}'s{%endifequal%} blog</a></li>
+              {% endif %}
+              {% if person.pubcount %}
+              <li><a href="{% if group %}{{group.get_absolute_url}}/people/{{person.slug}}/publications{% else %}{{person.get_absolute_url}}publications{% endif %}/">{%ifequal user.person.user_id person.user_id %}My{%else%}{{person.first_name}}'s{%endifequal%} publications</a></li>
+              {% endif %}
+              {% if person.rescount %}
+              <li><a href="{% if group %}{{group.get_absolute_url}}/people/{{person.slug}}/resources{% else %}{{person.get_absolute_url}}resources{% endif %}/">{%ifequal user.person.user_id person.user_id %}My{%else%}{{person.first_name}}'s{%endifequal%} resources</a></li>
+              {% endif %}
+              {% for child in person.pagechildren %}
+              {% if not child.private %}
+              <li><a href="{% if group %}{{group.get_absolute_url}}/people/{{person.slug}}/{{child.identifier}}{% else %}{{child.get_absolute_url}}{% endif %}">{{ child.pcontent.latest.title }}</a> {% if editor %}<a class="action" href="{{child.get_absolute_url}}delete/">(delete)</a>{% endif %}</li>
+              {% else %}
+              {% ifequal user.person.slug person.slug %}
+              <li><a href="{% if group %}{{group.get_absolute_url}}/people/{{person.slug}}/{{child.identifier}}{% else %}{{child.get_absolute_url}}{% endif %}">{{ child.pcontent.latest.title }}</a> {% if editor %}<a class="action" href="{{child.get_absolute_url}}delete/">(delete)</a>{% endif %}</li>
+              {% endifequal %}
+              {% endif %}
+              {% endfor %}
+            </ul>
+          {% endif %}
+          {% if group %}
+            <h3>{{group}} pages</h3>
+            <ul>
+              <li class="noindent"><a href="{{group.get_absolute_url}}">{{group}} home</a></li>
+              {% if group.newscount %}
+                <li><a href="{{group.get_absolute_url}}/news/">News</a></li>
+              {% endif %}
+              {% if group.eventscount %}
+                <li><a href="{{group.get_absolute_url}}/events/">Events</a></li>
+              {% endif %}
+              {% if group.pubcount %}
+                <li><a href="{{group.get_absolute_url}}/publications/">Publications</a></li>
+              {% endif %}
+              <li><a href="{{group.get_absolute_url}}/people/">People</a></li>
+              {% if group.rescount %}
+                <li><a href="{{group.get_absolute_url}}/resources/">Resources</a></li>
+              {% endif %}
+              {% if group.has_wiki %}
+                <li><a href="{{group.get_absolute_url}}/wiki/">Wiki</a></li>
+              {% endif %}
+              {% for child in group.children %}
+              {% if not child.private %}
+              <li><a href="{{child.get_absolute_url}}">{{ child.pcontent.latest.title }}</a> {% if editor %}<a class="action" href="{{child.get_absolute_url}}delete/">(delete)</a>{% endif %}</li>
+              {% else %}
+              {% if group|is_member:user.person %}
+              <li><a href="{{child.get_absolute_url}}">{{ child.pcontent.latest.title }}</a> {% if editor %}<a class="action" href="{{child.get_absolute_url}}delete/">(delete)</a>{% endif %}</li>
+              {% endif %}
+              {% endif %}
+              {% endfor %}
+            </ul>
+          {% endif %}
+          {% if not person and not group %}
+            <h3>ResearchPages</h3>
+            <ul>
+              <li><a href="{{urlbase}}/people/">People</a></li>
+              <li><a href="{{urlbase}}/projects/">Groups</a></li>
+              <li><a href="{{urlbase}}/help/">Help</a></li>
+              <li><a href="{{urlbase}}/help/faq/">FAQ</a></li>
+            </ul>
+          {% endif %}
+          {% if children %}
+          <h3>Pages in this section</h3>
+            <ul>
+            {% for child in children %}
+              {% if not child.private %}
+              <li><a href="{{child.identifier}}/">{{ child.pcontent.latest.title }}</a> {% if editor %}<a class="action" href="{{child.get_absolute_url}}delete/">(delete)</a>{% endif %}</li>
+              {% else %}
+              {% if user.is_superuser or group|is_member:user.person%}
+              <li><a href="{{child.identifier}}/">{{ child.pcontent.latest.title }}</a> {% if editor %}<a class="action" href="{{child.get_absolute_url}}delete/">(delete)</a>{% endif %}</li>
+              {% endif %}
+              {% endif %}
+            {% endfor %}
+            </ul>
+          {% endif %}
+      </div>

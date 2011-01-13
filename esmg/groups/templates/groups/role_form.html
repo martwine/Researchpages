@@ -1,0 +1,17 @@
+{% extends "base_message.html" %}
+
+{% block title %}{{group}}: management{% endblock %}
+
+{% block content %}
+<div id="message">
+  <h1>{{group}} settings</h1>
+<form action="" method="post" enctype="multipart/form-data">
+  <h2>Edit {{subject}}'s role in {{group}}</h2>
+  <ul>
+    {{roleform.as_p}}
+</ul>
+<p class="form-note">Role can be up to 400 characters. It will appear above {{subject}}'s photo on their profile page when veiwed through the {{group}} pages. Also, in the {{group}} group's people pages, {{subject}}'s role will be listed beside their small thumbnail picture.  </p>
+<p class="submit"><input type="submit" name="submit" value="save"></p>
+</form>
+</div>
+{% endblock %}

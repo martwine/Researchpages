@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 40
+/repos/apparatus/!svn/ver/406/middleware
+END
+__init__.py
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/repos/apparatus/!svn/ver/343/middleware/__init__.py
+END
+threadlocals.py
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/repos/apparatus/!svn/ver/406/middleware/threadlocals.py
+END

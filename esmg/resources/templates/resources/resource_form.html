@@ -1,0 +1,94 @@
+{% extends "base_message.html" %}
+
+{% block title %}Upload a new file{% endblock %}
+
+{% block content %}
+<div id="message">
+  {% if edit%}
+  <h1>Edit resource {{resource.title}}</h1>
+  {%else%}
+    <h1>Upload a new file</h1>
+  {% endif %}
+  {% if form.has_errors %}
+    <p class="message-error">Your submission contains errors displayed below.</p>
+  {% endif %}
+
+  <form action="" method="post" enctype="multipart/form-data">
+    <div class="form-line">
+      <label for="{{ form.file.get_id }}">File to upload</label>
+      
+      {{ form.file }}
+      {{ form.file_file }}
+      {% if resource %}<div class="form-note">(Currently {{resource.filename}})</div>{% endif %}
+      {% if form.file.errors %}<ul class="errorlist">{{ form.file.html_error_list }}</ul>{% endif %}
+    </div>
+    
+    <div class="form-line">
+      <label for="{{ form.type.get_id }}">Type of file</label> 
+      {{ form.type }}
+      {% if form.type.errors %}<ul class="errorlist">{{ form.type.html_error_list }}</ul>{% endif %}
+    </div>
+    
+    <div class="form-line">
+      <label for="{{ form.title.get_id }}">Title</label> 
+      {{ form.title }}
+      {% if form.title.errors %}<ul class="errorlist">{{ form.title.html_error_list }}</ul>{% endif %}
+    </div>
+    
+    <div class="form-line">
+      <label for="{{ form.description.get_id }}">Description</label> 
+      {{ form.description }}
+      {% if form.description.errors %}<ul class="errorlist">{{ form.description.html_error_list }}</ul>{% endif %}
+    </div>
+    
+    <div class="form-line">
+      <label for="{{ form.keywords.get_id }}">Keywords</label> 
+      {{ form.keywords }}
+      {% if form.keywords.errors %}<ul class="errorlist">{{ form.keywords.html_error_list }}</ul>{% endif %}
+    </div>
+    <div class="form-note">Comma separated keywords.</div>
+
+
+    <div class="form-line">
+      <label for="id_group">Project</label>
+      <select id="id_group" class="vSelectField" name="group" size="1">
+      <option value="" selected="selected">------</option>
+      {% if membership %}
+        {% for m in membership %}
+          <option value="{{m.group.id}}">{{m.group}}</option>
+        {% endfor %}
+      {% endif %}
+      </select>
+      {% if form.group.errors %}<ul class="errorlist">{{ form.group.html_error_list }}</ul>{% endif %}
+    </div>
+    <div class="form-note">If you want this item to appear in the list of 
+    resources assoicated with a particular group, select it here.</div>
+    
+    <div class="form-line">
+      <label for="{{ form.permissions.get_id }}">Permissions</label> 
+      {{ form.permissions }}
+      {% if form.permissions.errors %}<ul class="errorlist">{{ form.permissions.html_error_list }}</ul>{% endif %}
+    </div>
+    <div class="form-note">Permissions for this resource</div>
+
+    <input type="hidden" name="person" value="{{ user.id }}" />
+    <div class="form-submit">
+      <input type="submit" value="Save">
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

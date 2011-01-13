@@ -1,0 +1,113 @@
+{% extends "base_list.html" %}
+
+{% load publications %}
+{% load home %}
+
+{% block title %}{% firstof person group "ResearchPages"  %}: Publications{% endblock %}
+{% block heading %}{% if person %}{{person}}'s {% endif %}Publications{% endblock %}
+{% block error_type %}publications{% endblock %}
+{% block error_type_search %}publications{% endblock %}
+{% block list_type %}publications{% endblock %}
+
+{% block preamble %}
+  <div id="search">
+    <form action="{% if group %}{{ group.get_absolute_url }}{% else %}{{ urlbase }}{% endif %}/publications/search/" method="get">
+      Search publications:
+      <input type="text" name="q" value="" size="25">
+      <input type="submit" name="submit" value="Search">
+    </form>
+  </div>
+{% endblock %}
+
+{% block object %}
+  {% if object %}
+  <div class="result">
+    <ul>
+      <li class="object_heading"><a href="{% if group %}{{group.get_absolute_url}}/publications/{{object.id}}{% else %}{{ object.get_absolute_url }}{% endif %}" name="{{ forloop.counter }}">{{ object.title|truncatewords:"20" }}</a></li>
+    <li class="authors">
+      {% for authorship in object.authorship_set.all %}
+        {% if authorship.author.person %}
+          {% if group %}
+            {{ authorship.author.person|get_link_html:group }}
+          {% else %}
+          <a href="{{ authorship.get_absolute_url }}">{% endif %}{% endif %}{{ authorship }}{% if authorship.author.person %}
+          </a>
+          {% endif %},
+      {% endfor %}
+      </li>
+    <li class="object_details">{{object.year}}, {{ object.details }}</li>
+    {% if object.get_best_link %}
+    <li class="object_note"><a href="{{ object.get_best_link }}">{{ object.get_best_link|truncatemid:"30" }}</a></li>
+    {% endif %}
+    {% if object.file %}
+    <li class="link"><a href="{{ urlbase }}/media/{{ object.file }}">{{ object.filename }}</a></li>
+    {% endif %}
+    {% if group and group|is_manager:user.person %}
+      <li class="action"><a href="{% if group %}{{group.get_absolute_url}}{% else %}{{urlbase}}{% endif %}/publications/edit/{{object.id}}">edit</a></li>
+    {% else %}
+      {% for authorship in object.authorship_set.all %}
+        {% if authorship.author.person %}
+          {% ifequal user.person authorship.author.person %}
+            <li class="action"><a href="{% if group %}{{group.get_absolute_url}}{% else %}{{urlbase}}{% endif %}/publications/edit/{{object.id}}">edit</a></li>
+          {% endifequal %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  </ul> 
+  </div>
+  {% endif %}
+{% endblock %}
+
+{% block sidebar %}
+  <div id="sidebar" class="narrow">
+  {% if user.is_staff or not user.is_anonymous %}
+  <div id="actions" class="sidebar-block">
+    <h2>Actions</h2>
+    <ul>
+      {% if user.is_staff %}
+      <li><a href="{{ urlbase }}/admin/publications/publication/">Edit 
+      publications</a></li>
+      <li><a href="{{ urlbase }}/admin/publications/publication/add/">Add a new 
+      publication through the admin interface</a></li>
+      {% endif %}
+      {% if group %}
+      <li><a href="{{ group.get_absolute_url }}/publications/add/">Add a publication</a></li>
+      {% else %}
+      <li><a href="{{urlbase}}/publications/add/">Add a publication</a></li>
+      {% endif %}
+    </ul>
+  </div>
+    {% endif %}
+  {% include "pagenav-snippet.html" %}
+    {% if group %}
+      <div class="sidebar-block">
+        <h2>Publications - in brief</h2>
+        <ul>
+          {% for p in object_list %}
+            <li class="smallpubtitle"><a href="#{{ forloop.counter }}">{{ p.title|truncatewords:"8" }}</a></li>
+            <li class="authors">{{p}}</li>
+            <li class="journal">{{p.details}}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% else %}
+      {% if latest_pubs %}
+        <div class="sidebar-block">
+          <h2>Latest publications</h2>
+          <ul>
+            {% for p in latest_pubs %}
+              <li><a href="{{ p.get_absolute_url }}">{{ p }}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+    {% endif %}
+  </div>
+{% endblock %}
+
+
+{% block footer %}
+  <div id="footer">
+    &nbsp
+  </div>
+{% endblock %}

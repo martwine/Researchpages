@@ -1,0 +1,154 @@
+8
+
+dir
+587
+http://svn.researchpages.co.uk/repos/apparatus
+http://svn.researchpages.co.uk/repos/apparatus
+
+
+
+2007-10-15T22:49:08.083870Z
+587
+martin
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+abf93926-5328-0410-a704-dd263852005c
+
+groups
+dir
+
+manage.py
+file
+
+
+
+
+2007-04-08T09:29:28.000000Z
+436d756648d7f458aaa9c72570634e59
+2007-01-31T10:03:21.676339Z
+1
+martin
+has-props
+
+esmg.conf
+file
+
+
+
+
+2007-04-08T09:29:28.000000Z
+e6d8683891bdf92fe221c8f5278bcb02
+2007-01-31T10:03:21.676339Z
+1
+martin
+has-props
+
+textify.py
+file
+
+
+
+
+2007-09-04T10:34:08.000000Z
+3343a6965534806c09dbd85fcff6cdea
+2007-09-11T08:52:27.000648Z
+551
+martin
+
+people
+dir
+
+__init__.py
+file
+
+
+
+
+2007-04-08T16:13:00.000000Z
+d41d8cd98f00b204e9800998ecf8427e
+2007-01-31T10:03:21.676339Z
+1
+martin
+has-props
+
+my.cnf
+file
+
+
+
+
+2007-08-31T16:13:33.000000Z
+fded13ff178fd64e1d26606fac19c67d
+2007-08-31T16:13:19.698419Z
+541
+martin
+
+publications
+dir
+
+templates
+dir
+
+apparatus
+dir
+
+django
+file
+
+
+
+
+2007-04-08T09:29:28.000000Z
+f8888f0195559d40ae0bcb3ad27b4a87
+2007-01-31T10:03:21.676339Z
+1
+martin
+has-props
+
+wiki
+dir
+
+resources
+dir
+
+urls.py
+file
+598
+
+
+
+2007-09-21T10:25:05.000000Z
+9effe60328563f190b79b417ce56e899
+2007-10-22T08:26:52.907653Z
+590
+martin
+has-props
+
+
+
+
+urls.py.r587
+urls.py.r598
+urls.py.mine
+
+institutions
+dir
+
+middleware
+dir
+
+comms
+dir
+

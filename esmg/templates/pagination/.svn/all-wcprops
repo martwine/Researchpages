@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/repos/apparatus/!svn/ver/476/templates/pagination
+END
+search.html
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/repos/apparatus/!svn/ver/1/templates/pagination/search.html
+END
+list.html
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/repos/apparatus/!svn/ver/476/templates/pagination/list.html
+END

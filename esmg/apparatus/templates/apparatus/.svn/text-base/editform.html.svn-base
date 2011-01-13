@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% load markup %}
+
+{% block title %}
+  {% if create %}
+    New page
+  {% else %}
+    {% if preview %}
+      Preview page
+    {% else %}
+      Edit page
+    {% endif %}
+  {% endif %}
+{% endblock %}
+
+
+{% block content %}
+
+  <div id="bigform">
+  <h1>{% if create %}New{% else %}{% if preview %}Preview{% else %}Edit{% endif %}{% endif %} Page</h1>
+  <div id="actions" class="formactions">
+    <h2>Actions</h2>
+    <ul>
+      {% if group %}
+        <li><a href="{{ urlbase }}/{{group.acronym}}/{{ page.uri }}">Return to page</a></li>
+      {% else %}
+        <li><a href="{{ urlbase }}{{ page.uri }}">Return to page</a></li>
+      {% endif %}
+      <li><a href="#versions">Revert to an older version</a></li>
+    </ul>
+  </div>
+    {% if create %}
+      <p class="message-hint">
+        {% if homecreate %}
+          You are creating a new top-level page.
+        {% else %}
+          {% if personcreate %}
+            You are creating a new page under your home page.
+          {% else %}
+            You are creating a new page under
+            &ldquo;{{ pagecontent.title }}&rdquo;.
+          {% endif %}
+        {% endif %}
+      </p>
+    {% else %}
+      {% if preview %}
+        <p class="message-hint">You are previewing the new content for
+          &ldquo;{{ pagecontent.title }}&rdquo; at
+          {% if group %}
+           <a href="{{ urlbase }}/{{group.acronym}}{{ page.uri }}">{{ urlbase }}/{{group.acronym}}{{ page.uri }}</a>.</p>
+          {% else %}
+          <a href="{{ page.get_absolute_url }}">{{ page.get_absolute_url }}</a>.</p>
+          {% endif %}
+      {% else %}
+         <p class="message-hint">You are editing the page
+          &ldquo;{{ pagecontent.title }}&rdquo; at
+          {% if group %}
+           <a href="{{ urlbase }}/{{group.acronym}}{{ page.uri }}">{{ urlbase }}/{{group.acronym}}{{ page.uri }}</a>.</p>
+          {% else %}
+          <a href="{{ page.get_absolute_url }}">{{ page.get_absolute_url }}</a>.</p>
+          {% endif %}
+      {% endif %}
+    {% endif %}
+
+    {% if preview %}
+      <div id="preview">
+        <h1>{{ title }}</h1>
+        {{ body|textile }}
+      </div>
+
+      <!--  <div class="message-hint">
+        <p>Please ensure this page conforms to the <a
+        href="{{ urlbase }}/help/style/">style guide</a> before 
+        saving.</p>
+      </div> -->
+      
+
+      <form action="" method="post" class="page-save">
+        <input type="hidden" name="identifier" value="{{ form.identifier.data|escape }}">
+        <input type="hidden" name="title" value="{{ form.title.data|escape }}">
+        <input type="hidden" name="body" value="{{ form.body.data|escape }}">
+        <input type="hidden" name="editor_id" value="{{ form.editor_id.data|escape }}">
+        <input type="hidden" name="subeditor_id" value="{{ form.subeditor_id.data|escape }}">
+        <input type="hidden" name="subeditor2_id" value="{{ form.subeditor2_id.data|escape }}">
+        <input type="hidden" name="private" value="{{ form.private.data|escape }}">
+        <input type="submit" name="submit" value="Save">
+      </form>
+
+      <h2>Edit page</h2>
+    {% endif %}
+
+    {% if form.has_errors %}
+      <p class="message-error">Your submission contains the errors displayed below.</p>
+    {% endif %}
+
+   <form action="" method="post">
+     <p>
+        <label for="{{ form.title.get_id }}">Heading</label> 
+        {{ form.title }}
+        {% if form.title.errors %}<ul class="errorlist">{{ form.title.html_error_list }}</ul>{% endif %}
+      </p>
+      <p>
+        <label for="{{ form.body.get_id }}">Content</label> 
+        {{ form.body }}
+        {% if form.body.errors %}<ul class="errorlist">{{ form.body.html_error_list }}</ul>{% endif %}
+      </p>
+        <p class="form-note">The content for this page. You can use
+          <a href="http://hobix.com/textile/" target="_blank">Textile</a> to
+          format your text.</p>
+        <p class="form-hint">Please try to use basic formatting only - e.g. use heading styles h1 
+        to h3 (e.g "h1. Your Title"), and avoid fixing the size or color of your text 
+        unless you have a very good reason - the formatting and color of your 
+        content will be controlled by stylesheets which may vary and your fixed text may end up looking bad! Bold, underline, italic; links, lists, tables and images are all fine. Ultimately, these are your pages, to do with what you wish, so don't be afraid to experiment, but do consider that simple, clean design is the best way to get your message across. The person in charge of your group or project may have more specific requirements of your content on group pages - you should consult with them before doing anything too outlandish! Another good textile reference can be found <a href="http://www.brajeshwar.com/reference/mtmanual_textile2.html">here</a></p>  
+        </p>
+      {% if create or not page.is_tree_top %}
+          <p>
+            <label for="{{ form.identifier.get_id }}">Identifier</label> 
+            {{ form.identifier }}</p>
+            {% if form.identifier.errors %}<ul class="errorlist">{{ form.identifier.html_error_list }}</ul>{% endif %}
+            <p class="form-note">The part of the URL which refers directly to
+              this page, e.g.
+              http://researchpages.net/esmg/<strong>working-groups</strong>/. Please use 
+              letters, numbers and hyphens (&ldquo;-&rdquo;) only.
+
+            <p>
+            <label for="{{ form.private.get_id }}">Make page private</label> 
+            {{ form.private }}
+            <p class="form-note">
+              Making a page private means that, in the case of a group page, 
+              only group members will be able to see it. If it is one of your 
+              personal pages, then only you will be able to see it. All sub 
+              pages will be made private, and made public again when their 
+              parent is. Any pages you create under a private page will be 
+              private too by default. 
+              </p>
+            {% if form.private.errors %}<ul class="errorlist">{{ form.private.html_error_list }}</ul>{% endif %}
+            </p>
+
+            <p><label for="{{ form.editor_id.get_id }}">Editor</label> 
+          {{ form.editor_id }}
+            <p class="form-note">The person who will be responsible for editing 
+            this page. Editors of parent pages will also be able to edit this 
+            page, as will group leaders and editors in the case of group pages.
+            You may add optional extra editors (subeditors) below</p>
+            {% if form.editor_id.errors %}<ul class="errorlist">{{ form.editor_id.html_error_list }}</ul>{% endif %}
+            </p>
+            <p><label for="{{ form.subeditor_id.get_id }}">Subeditor 1</label> 
+            {{ form.subeditor_id }}
+            {% if form.subeditor_id.errors %}<ul class="errorlist">{{ form.subeditor_id.html_error_list }}</ul>{% endif %}
+            </p>
+            <p><label for="{{ form.subeditor2_id.get_id }}">Subeditor 2</label> 
+            {{ form.subeditor2_id }}
+            {% if form.subeditor2_id.errors %}<ul class="errorlist">{{ form.subeditor2_id.html_error_list }}</ul>{% endif %}
+            </p>
+        {% else %}
+          <input type="hidden" name="identifier" value="{{ form.identifier.data|escape }}">
+          <input type="hidden" name="editor_id" value="{{ form.editor_id.data|escape }}">
+          <input type="hidden" name="subeditor_id" value="{{ form.subeditor_id.data|escape }}">
+          <input type="hidden" name="subeditor2_id" value="{{ form.subeditor2_id.data|escape }}">
+      {% endif %}
+
+      <p class="form-hint"><a href="{{ urlbase }}/resources/popup/" target="_blank"
+        onclick="window.open('{{ urlbase }}/resources/popup/', 'add', 
+        'width=500,height=450,toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes'); 
+        return false;">Find a picture, document or file to add to this 
+        page</a></p>
+      
+      <p class="form-hint"><a href="{{ urlbase }}/resources/add/" target="_blank"
+        onclick="window.open('{{ urlbase }}/resources/add/', 'add', 
+        'width=500,height=450,toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes'); 
+        return false;">Upload a picture, document or other file</a></p>
+      <p class="form-note">You can upload any file to be accessed by just 
+      you, group memebrs, site members or everybody in the world</p>
+      
+
+      <p class="submit">
+        <input type="submit" name="submit" value="Preview">
+        {% if preview %}
+          <input type="submit" name="submit" value="Save">
+        {% endif %}
+        </p>
+    </form>
+
+    {% if not create %}
+      <div class="versions">
+        <a name="versions"></a>
+        <h2>Versions</h2>
+        {% if page.pcontent.all %}
+          <p>Choose an older version to revert to.</p>
+          {% for version in page.pcontent.all %}
+            {% if not forloop.first %}
+              <p class="version">
+              {% if group and personpage %} 
+                <a href="{{ urlbase }}/{{group.acronym}}{{ page.uri }}versions/{{ version.version }}/">{{ version.version }}. {{ version.title }}</a>
+              {% else %}
+                <a href="{{ urlbase }}{{ page.uri }}versions/{{ version.version }}/">{{ version.version }}. {{ version.title }}</a>
+              {% endif %}
+                <span class="version-stamp">
+                  {{ version.last_editor }},
+                  {{ version.time|date:"G:i, d/m/Y" }}
+                </span>
+              </p>
+            {% endif %}
+          {% endfor %}
+        {% else %}
+          <p>There are no previous versions of this page.</p>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

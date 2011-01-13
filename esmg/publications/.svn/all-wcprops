@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/repos/apparatus/!svn/ver/582/publications
+END
+views.py
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/repos/apparatus/!svn/ver/481/publications/views.py
+END
+__init__.py
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/repos/apparatus/!svn/ver/1/publications/__init__.py
+END
+models.py
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/repos/apparatus/!svn/ver/582/publications/models.py
+END
+urls.py
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/repos/apparatus/!svn/ver/468/publications/urls.py
+END

@@ -1,0 +1,177 @@
+{% extends "base_list_resources.html" %}
+
+{% load publications %}
+{% load resources %}
+{% load home %}
+
+{% block title %}{% firstof person group "ResearchPages"  %}: Resources{% endblock %}
+{% block heading %}{% if person and group %}{{person}}'s r{% else %}R{% endif %}esources{% endblock %}
+{% block error_type %}resources{% endblock %}
+{% block error_type_search %}resources{% endblock %}
+{% block list_type %}resources{% endblock %}
+
+{% block object_list %}
+{% regroup object_list|dictsort:"type" by type as type_list %}
+{% for type in type_list %}
+{% if type.list|has_viewable_entries:user %}
+<a name="{{type.grouper}}">&nbsp;</a>
+<br>
+<h2>
+  {% ifequal type.grouper 'cdoc' %}Documents{% endifequal %}
+  {% ifequal type.grouper 'apos' %}Posters{% endifequal %}
+  {% ifequal type.grouper 'bpre' %}Presentations{% endifequal %}
+  {% ifequal type.grouper 'ddat' %}Data Files{% endifequal %}
+  {% ifequal type.grouper 'epic' %}Images / graphics{% endifequal %}
+  {% ifequal type.grouper 'fres' %}Other files{% endifequal %}</h2>
+
+{% endif %}
+{% for object in type.list %}
+  {% ifequal object.permissions 'pblc' %}
+  <div class="result">
+    <ul>
+      <li class="object_heading">
+        {{ object.title }}</li>
+      <li class="object_description"> {{ object.description }}</li>
+      <li class="object_note"><a href="{{urlbase}}/media/{{object.file}}">{{ object }}</a> </li>
+      {% if group %}<li class="object_note">Originator: <a href="{{group.get_absolute_url}}/people/{{object.person.slug}}/">{{ object.person }}</a> </li>{% endif %}
+        {% ifequal user.person object.person %}
+          <li class="action"><a href="delete/{{ object.id }}/">Delete</a>
+            </li>
+        <li class="action">
+          <a href="edit/{{ object.id }}/" target="_blank"
+            onclick="window.open('edit/{{ object.id }}/', 'edit', 
+            'width=500,height=450,toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes'); 
+            return false;""}})""">Edit</a></li>
+        {% endifequal %}
+    </ul>
+    </div>    
+  {% endifequal %}
+
+  {% ifequal object.permissions 'rstrc' %}
+    {% if not request.user.is_anonymous %}
+    <div class="result">
+      <ul>
+        <li class="object_heading">
+            {{ object.title }}</li>
+        <li class="object_description">     {{ object.description }}</li>
+        <li class="object_note"><a href="{{ urlbase }}/resources/{{ object.id }}/info/">{{ object }}</a> </li>
+      {% if group %}<li class="object_note">Originator: <a href="{{group.get_absolute_url}}/people/{{object.person.slug}}/">{{ object.person }}</a> </li>{% endif %}
+        {% ifequal user.person object.person %}
+          <li class="action"><a href="delete/{{ object.id }}/">Delete</a>
+            </li>
+        <li class="action">
+          <a href="edit/{{ object.id }}/" target="_blank"
+            onclick="window.open('edit/{{ object.id }}/', 'edit', 
+            'width=500,height=450,toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes'); 
+            return false;""}})""">Edit</a></li>
+        {% endifequal %}
+      </ul>
+    </div>
+    {% endif%}
+  {% endifequal %}
+        
+  {% ifequal object.permissions 'prvt' %}
+    {% if grouptest  %}
+    <div class="result">
+      <ul>
+        <li class="object_heading">
+            {{ object.title }}</li>
+        <li class="object_description">{{ object.description }}</li>
+        <li class="object_note"><a href="{{ urlbase }}/resources/{{ object.id }}/info/">{{ object }}</a> </li>
+      {% if group %}<li class="object_note">Originator: <a href="{{group.get_absolute_url}}/people/{{object.person.slug}}/">{{ object.person }}</a> </li>{% endif %}
+        {% ifequal user.person object.person %}
+          <li class="action"><a href="delete/{{ object.id }}/">Delete</a>
+            </li>
+        <li class="action">
+          <a href="edit/{{ object.id }}/" target="_blank"
+            onclick="window.open('edit/{{ object.id }}/', 'edit', 
+            'width=500,height=450,toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes'); 
+            return false;""}})""">Edit</a></li>
+        {% endifequal %}
+      </ul>
+    </div>
+    {% else %}
+      {% ifequal person user.person  %}
+      <div class="result">
+        <ul>
+          <li class="object_heading">
+              {{ object.title }}</li>
+          <li class="object_description">{{ object.description }}</li>
+          <li class="object_note"><a href="{{ urlbase }}/resources/{{ object.id }}/info/">{{ object }}</a> </li>
+        {% ifequal user.person object.person %}
+          <li class="action"><a href="delete/{{ object.id }}/">Delete</a>
+            </li>
+        <li class="action">
+          <a href="edit/{{ object.id }}/" target="_blank"
+            onclick="window.open('edit/{{ object.id }}/', 'edit', 
+            'width=500,height=450,toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes'); 
+            return false;""}})""">Edit</a></li>
+        {% endifequal %}
+        </ul>
+      </div>
+      {% else %}
+        {% ifequal object.person user.person  %}
+      <div class="result">
+        <ul>
+          <li class="object_heading">
+                {{ object.title }}</li>
+          <li class="object_description">{{ object.description }}</li>
+          <li class="object_note"><a href="{{ urlbase }}/resources/{{ object.id }}/info/">{{ object }}</a> </li>
+        {% ifequal user.person object.person %}
+          <li class="action"><a href="delete/{{ object.id }}/">Delete</a>
+            </li>
+        <li class="action">
+          <a href="edit/{{ object.id }}/" target="_blank"
+            onclick="window.open('edit/{{ object.id }}/', 'edit', 
+            'width=500,height=450,toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes'); 
+            return false;""}})""">Edit</a></li>
+        {% endifequal %}
+        {% endifequal %}
+      {% endifequal %}
+    {% endif %}
+  {% endifequal%}
+  {% endfor %}
+  {% endfor %}
+{% endblock %}
+
+{% block sidebar %}
+  <div id="sidebar" class="narrow">
+    {% if not user.is_anonymous %}
+    {% if user.is_staff or user.is_superuser or group|is_member:user.person %}
+    <div class="sidebar-block" id="actions">
+      <h2>Actions</h2>
+    <ul>
+      <li><a href="{{ urlbase }}/resources/add/" target="_blank"
+        onclick="window.open('{{ urlbase }}/resources/add/', 'add', 
+        'width=500,height=450,toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes'); 
+        return false;""}})""">Add a new resource</a></li>
+    </ul>
+      </div>
+      {% endif %}  
+      {% endif %}
+      <div class="sidebar-block">
+        <h2>Quick Links</h2>
+        <ul>
+          {% regroup object_list|dictsort:"type" by type as type_list %}
+          {% for type in type_list %}
+            {% if type.list|has_viewable_entries:user %}
+            <li><a href="#{{type.grouper}}">
+          {% ifequal type.grouper 'cdoc' %}Documents{% endifequal %}
+          {% ifequal type.grouper 'apos' %}Posters{% endifequal %}
+          {% ifequal type.grouper 'bpre' %}Presentations{% endifequal %}
+          {% ifequal type.grouper 'ddat' %}Data Files{% endifequal %}
+          {% ifequal type.grouper 'epic' %}Images / graphics{% endifequal %}
+          {% ifequal type.grouper 'fres' %}Other files{% endifequal %}
+          </a></li>
+        {% endif %}
+        {% endfor %}        
+        </ul>
+      </div>
+      {% include "pagenav-snippet.html" %}
+  </div>
+{% endblock %}
+{% block footer %}
+  <div id="footer">
+    &nbsp;
+  </div>
+{% endblock %}

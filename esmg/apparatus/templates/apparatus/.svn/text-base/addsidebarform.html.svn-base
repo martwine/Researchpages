@@ -1,0 +1,51 @@
+{% extends "base_message.html" %}
+
+{% load markup %}
+
+{% block title %}Add sidebars{% endblock %}
+
+{% block content %}
+
+  <div id="message">
+  <h1>Add sidebars</h1>
+    {% if sidebars %}
+      <p class="message-hint">You are adding one or more new sidebars to
+        &ldquo;{{ page.pcontent.latest.title }}&rdquo; at
+        <a href="{{ page.get_absolute_url }}">{{ page.get_absolute_url }}</a>.
+      </p>
+    {% else %}
+      {% if no_sidebars %}
+        <p class="message-error">No sidebars have been created yet.</p>
+      {% else %}
+        <p class="message-error"> All existing sidebars are already associated 
+        with this page.</p>
+      {% endif %}
+    {% endif %}
+
+    <p class="form-note">
+    <a class="actions" href="{{ urlbase }}/sidebars/create/?from={{ urlbase }}{{ page.uri }}sidebaradd/">Create a new sidebar</a>
+    </div>
+    
+    {% if sidebars %}
+      <form action="" method="post">
+        {% for sidebar in sidebars %}
+        <ul class="addsidebarlist">
+          <li><label for="{{ sidebar.name.get_id }}">{{ sidebar.name }}</label></li> 
+          <li><input type="checkbox" name="{{ sidebar.id }}" value="on"></li>
+          <li>{{ sidebar.body|textile|striptags|truncatewords:"10" }}</li>
+        </ul>
+        {% endfor %}
+        <div class="form-submit">
+          <input type="submit" value="Add sidebars">
+        </div>
+      </form>
+    {% endif %}
+  </div>
+{% endblock %}  
+
+{% block actions %}
+  <ul>
+    <li class="action-label">Actions</li>
+    <li><a href="{{ urlbase }}/sidebars/create/?from={{ urlbase }}{{ page.uri }}sidebaradd/">Create a new sidebar</a></li>
+  </ul>
+{% endblock %}

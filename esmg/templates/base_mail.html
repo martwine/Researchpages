@@ -1,0 +1,29 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+  <head>
+    <title>{% block title %}{% endblock %}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <style>
+      html, body, form, img { margin:0; border:0; padding:0; }
+      body { background:white; margin:1em; }
+      body { font-family:sans-serif; color:#333;
+        font-size:small }
+
+      {% include "base_mail_style.html" %}
+    </style>
+  </head>
+
+  <body>
+    <div id="email">
+      <div id="logo">
+        <a href="{{ urlbase }}/">
+          <img src="http://researchpages.net/media/logo-small.png" width="140" height="80" alt="ResearchPages">
+        </a>
+      </div>
+
+      {% block body %}{% endblock %}
+    </div>
+  </body>
+</html>
